@@ -21,7 +21,8 @@ func main() {
 	mux.HandleFunc("/", handler)
 
 	healthchecks.DiskChecks(&checks)
-	//healthchecks.MemInfo(&checks)
+	healthchecks.MemInfo(&checks)
+	healthchecks.LoadAvg(&checks)
 
 	mux.HandleFunc("/__health", fthealth.Handler("myserver", "a server", checks...))
 
