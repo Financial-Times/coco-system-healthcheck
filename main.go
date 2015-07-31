@@ -1,8 +1,8 @@
 package main
 
 import (
-	healthchecks "./checks"
 	"fmt"
+	healthchecks "github.com/Financial-Times/coco-system-healthcheck/checks"
 	"github.com/Financial-Times/go-fthealth"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -21,7 +21,8 @@ func main() {
 	mux.HandleFunc("/", handler)
 
 	healthchecks.DiskChecks(&checks)
-	//healthchecks.MemInfo(&checks)
+	healthchecks.MemInfo(&checks)
+	healthchecks.LoadAvg(&checks)
 
 	mux.HandleFunc("/__health", fthealth.Handler("myserver", "a server", checks...))
 
