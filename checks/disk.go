@@ -3,50 +3,45 @@ package checks
 import (
 	"fmt"
 	"github.com/Financial-Times/go-fthealth"
-	"syscall"
+	linuxproc "github.com/c9s/goprocinfo/linux"
 )
 
-var stat syscall.Statfs_t
-
-func spaceAvailablePercent(path string) float64 {
-	syscall.Statfs(path, &stat)
-	avail := stat.Bavail * uint64(stat.Bsize)
-	total := stat.Blocks * uint64(stat.Bsize)
-	return (float64(avail) / float64(total) * 100)
+func spaceAvailablePercent(disk *linuxproc.Disk) float64 {
+	return (float64(disk.Free) / float64(disk.All) * 100)
 }
 
-func diskSpaceCheck() error {
-	spaceAv := spaceAvailablePercent("/")
-	if spaceAv < 20 {
+func diskSpaceCheck(path string) error {
+	d, err := linuxproc.ReadDisk(path)
+	if err != nil {
+		return fmt.Errorf("Cannot read disk info of volume mounted under %s.", path)
+	}
+	if spaceAvailablePercent(d) < 20 {
 		return fmt.Errorf("No space on root")
 	}
 	return nil
+}
+
+func rootDiskSpaceCheck() error {
+	return diskSpaceCheck("/")
 }
 
 func bootDiskSpaceCheck() error {
-	spaceAv := spaceAvailablePercent("/boot")
-	if spaceAv < 20 {
-		return fmt.Errorf("No space on root")
-	}
-	return nil
+	return diskSpaceCheck("/boot")
 }
 
 func DiskChecks(checks *[]fthealth.Check) {
-	spaceAv := spaceAvailablePercent("/")
-	// health checks
 	rootDiskSpaceCheck := fthealth.Check{
 		BusinessImpact:   "No newspaper",
-		Name:             fmt.Sprintf("Disk Space \"/\" %.2f%%", spaceAv),
+		Name:             "Root disk space check.",
 		PanicGuide:       "Keep calm and carry on",
 		Severity:         2,
 		TechnicalSummary: "rm -rf some shit",
-		Checker:          diskSpaceCheck,
+		Checker:          rootDiskSpaceCheck,
 	}
 
-	spaceAv = spaceAvailablePercent("/boot")
 	bootDiskSpaceCheck := fthealth.Check{
 		BusinessImpact:   "No newspaper",
-		Name:             fmt.Sprintf("Disk Space \"/boot\" %.2f%%", spaceAv),
+		Name:             "Boot disk space check",
 		PanicGuide:       "Keep calm and carry on",
 		Severity:         2,
 		TechnicalSummary: "rm -rf some shit",
