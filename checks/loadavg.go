@@ -7,7 +7,7 @@ import (
 )
 
 func loadAvgCheck() error {
-	l, err := linuxproc.ReadLoadAvg("/proc/loadavg")
+	l, err := linuxproc.ReadLoadAvg(baseDir + "/proc/loadavg")
 
 	if err != nil {
 		return fmt.Errorf("Couldn't read loadavg data")

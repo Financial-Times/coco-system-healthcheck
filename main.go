@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	healthchecks "github.com/Financial-Times/coco-system-healthcheck/checks"
 	"github.com/Financial-Times/go-fthealth"
@@ -9,7 +10,8 @@ import (
 )
 
 var (
-	checks []fthealth.Check
+	checks   []fthealth.Check
+	hostPath = flags.String("hostPath", "/host_dir", "The path where the host fs is mounted to the container")
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -17,12 +19,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	flag.Parse()
 	mux := mux.NewRouter()
 	mux.HandleFunc("/", handler)
 
-	healthchecks.DiskChecks(&checks)
-	healthchecks.MemInfo(&checks)
-	healthchecks.LoadAvg(&checks)
+	healthchecks.RegisterChecks(hostDir, &checks)
 
 	mux.HandleFunc("/__health", fthealth.Handler("myserver", "a server", checks...))
 
