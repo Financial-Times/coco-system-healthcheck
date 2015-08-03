@@ -11,7 +11,7 @@ import (
 
 var (
 	checks   []fthealth.Check
-	hostPath = flags.String("hostPath", "/host_dir", "The path where the host fs is mounted to the container")
+	hostPath = flag.String("hostPath", "/host_dir", "The path where the host fs is mounted to the container")
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -23,7 +23,7 @@ func main() {
 	mux := mux.NewRouter()
 	mux.HandleFunc("/", handler)
 
-	healthchecks.RegisterChecks(hostDir, &checks)
+	healthchecks.RegisterChecks(*hostPath, &checks)
 
 	mux.HandleFunc("/__health", fthealth.Handler("myserver", "a server", checks...))
 
