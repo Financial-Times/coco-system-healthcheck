@@ -8,5 +8,5 @@ EXPOSE 8080
 
 WORKDIR /
 
-CMD /system-healthcheck --procDir=$PROC_DIR
+CMD /system-healthcheck --hostPath=$HOST_DIR
 
