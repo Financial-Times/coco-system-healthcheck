@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"flag"
 	healthchecks "github.com/Financial-Times/coco-system-healthcheck/checks"
 	"github.com/Financial-Times/go-fthealth"
 	"github.com/gorilla/mux"
@@ -9,21 +9,16 @@ import (
 )
 
 var (
-	checks []fthealth.Check
+	checks   []fthealth.Check
+	hostPath = flag.String("hostPath", "/host_dir", "The dir path of the mounted host fs (in the container)")
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello, %s.\n", r.URL.Path[1:])
-}
-
 func main() {
+	flag.Parse()
+
+	healthchecks.RegisterChecks(*hostPath, &checks)
+
 	mux := mux.NewRouter()
-	mux.HandleFunc("/", handler)
-
-	healthchecks.DiskChecks(&checks)
-	healthchecks.MemInfo(&checks)
-	healthchecks.LoadAvg(&checks)
-
 	mux.HandleFunc("/__health", fthealth.Handler("myserver", "a server", checks...))
 
 	err := http.ListenAndServe(":8080", mux)

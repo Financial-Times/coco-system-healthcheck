@@ -22,11 +22,11 @@ func diskSpaceCheck(path string) error {
 }
 
 func rootDiskSpaceCheck() error {
-	return diskSpaceCheck("/")
+	return diskSpaceCheck(baseDir + "/")
 }
 
 func bootDiskSpaceCheck() error {
-	return diskSpaceCheck("/boot")
+	return diskSpaceCheck(baseDir + "/boot")
 }
 
 func DiskChecks(checks *[]fthealth.Check) {

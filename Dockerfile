@@ -7,5 +7,5 @@ EXPOSE 8080
 
 WORKDIR /
 
-CMD /system-healthcheck 
+CMD /system-healthcheck --hostPath=$HOST_DIR
 

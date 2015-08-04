@@ -7,7 +7,7 @@ import (
 )
 
 func meminfo() linuxproc.MemInfo {
-	meminfo, err := linuxproc.ReadMemInfo("/proc/meminfo")
+	meminfo, err := linuxproc.ReadMemInfo(baseDir + "/proc/meminfo")
 	if err != nil {
 		fmt.Errorf("meminfo read fail")
 	}
