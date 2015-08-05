@@ -10,7 +10,7 @@ import (
 
 var (
 	checks   []fthealth.Check
-	hostPath = flag.String("hostPath", "/host_dir", "The dir path of the mounted host fs (in the container)")
+	hostPath = flag.String("hostPath", "", "The dir path of the mounted host fs (in the container)")
 )
 
 func main() {
