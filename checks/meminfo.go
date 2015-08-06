@@ -14,7 +14,7 @@ func meminfo() linuxproc.MemInfo {
 	return *meminfo
 }
 
-func avMemeryCheck() error {
+func avMemoryCheck() error {
 	meminfo := meminfo()
 	available := meminfo.MemAvailable
 	total := meminfo.MemTotal
@@ -32,7 +32,7 @@ func MemInfo(checks *[]fthealth.Check) {
 		PanicGuide:       "Keep calm and carry on",
 		Severity:         2,
 		TechnicalSummary: "Spin up more boxes",
-		Checker:          avMemeryCheck,
+		Checker:          avMemoryCheck,
 	}
 	*checks = append(*checks, memAvCheck)
 }
