@@ -20,7 +20,7 @@ func avMemoryCheck() error {
 	total := meminfo.MemTotal
 	availablePercent := float64(available) / float64(total) * 100
 	if availablePercent < 20 {
-		fmt.Errorf("Low available memory: %2.1f %%", availablePercent)
+		return fmt.Errorf("Low available memory: %2.1f %%", availablePercent)
 	}
 	return nil
 }
