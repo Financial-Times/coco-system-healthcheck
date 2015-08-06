@@ -14,13 +14,13 @@ func meminfo() linuxproc.MemInfo {
 	return *meminfo
 }
 
-func avMemeryCheck() error {
+func avMemoryCheck() error {
 	meminfo := meminfo()
 	available := meminfo.MemAvailable
 	total := meminfo.MemTotal
 	availablePercent := float64(available) / float64(total) * 100
 	if availablePercent < 20 {
-		fmt.Errorf("Low available memory: %2.1f %%", availablePercent)
+		return fmt.Errorf("Low available memory: %2.1f %%", availablePercent)
 	}
 	return nil
 }
@@ -32,7 +32,7 @@ func MemInfo(checks *[]fthealth.Check) {
 		PanicGuide:       "Keep calm and carry on",
 		Severity:         2,
 		TechnicalSummary: "Spin up more boxes",
-		Checker:          avMemeryCheck,
+		Checker:          avMemoryCheck,
 	}
 	*checks = append(*checks, memAvCheck)
 }
