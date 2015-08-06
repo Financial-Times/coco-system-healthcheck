@@ -20,20 +20,15 @@ func avMemeryCheck() error {
 	total := meminfo.MemTotal
 	availablePercent := float64(available) / float64(total) * 100
 	if availablePercent < 20 {
-		fmt.Errorf("Low available memery: %2.f", availablePercent)
+		fmt.Errorf("Low available memory: %2.1f %%", availablePercent)
 	}
 	return nil
 }
 
 func MemInfo(checks *[]fthealth.Check) {
-	meminfo := meminfo()
-	available := meminfo.MemAvailable
-	total := meminfo.MemTotal
-	availablePercent := float64(available) / float64(total) * 100
-
 	memAvCheck := fthealth.Check{
 		BusinessImpact:   "No newspaper",
-		Name:             fmt.Sprintf("Memory Available %d KB (%2.f%%)", available, availablePercent),
+		Name:             "Memory load check",
 		PanicGuide:       "Keep calm and carry on",
 		Severity:         2,
 		TechnicalSummary: "Spin up more boxes",
