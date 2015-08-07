@@ -46,7 +46,7 @@ func DiskChecks(checks *[]fthealth.Check) {
 
 	mountedDiskSpaceCheck := fthealth.Check{
 		BusinessImpact:   "No newspaper",
-		Name:             "Mounted disk space check (/vol)",
+		Name:             "Persistent disk space check mounted on '/vol' (always true for stateless nodes)",
 		PanicGuide:       "Keep calm and carry on",
 		Severity:         2,
 		TechnicalSummary: "rm -rf some shit",
