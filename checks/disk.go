@@ -33,20 +33,20 @@ func mountedDiskSpaceCheck() error {
 
 func DiskChecks(checks *[]fthealth.Check) {
 	rootDiskSpaceCheck := fthealth.Check{
-		BusinessImpact:   "No newspaper",
+		BusinessImpact:   "A part of the publishing workflow might be effected",
 		Name:             "Root disk space check.",
-		PanicGuide:       "Keep calm and carry on",
+		PanicGuide:       "Please refer to technical summary",
 		Severity:         2,
-		TechnicalSummary: "rm -rf some shit",
+		TechnicalSummary: "Please clear some disk space on the 'root' mount",
 		Checker:          rootDiskSpaceCheck,
 	}
 
 	mountedDiskSpaceCheck := fthealth.Check{
-		BusinessImpact:   "No newspaper",
+		BusinessImpact:   "A part of the publishing workflow might be effected",
 		Name:             "Mounted disk space check (/vol)",
-		PanicGuide:       "Keep calm and carry on",
+		PanicGuide:       "Please refer to technical summary",
 		Severity:         2,
-		TechnicalSummary: "rm -rf some shit",
+		TechnicalSummary: "Please clear some disk space on the 'vol' mount",
 		Checker:          mountedDiskSpaceCheck,
 	}
 
