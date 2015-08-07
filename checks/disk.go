@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Financial-Times/go-fthealth"
 	linuxproc "github.com/c9s/goprocinfo/linux"
+	"os"
 )
 
 func spaceAvailablePercent(disk *linuxproc.Disk) float64 {
@@ -13,7 +14,7 @@ func spaceAvailablePercent(disk *linuxproc.Disk) float64 {
 func diskSpaceCheck(path string) error {
 	d, err := linuxproc.ReadDisk(path)
 	if err != nil {
-		return fmt.Errorf("Cannot read disk info of volume mounted under %s.", path)
+		return fmt.Errorf("Cannot read disk info of %s file system.", path)
 	}
 	if spaceAvailablePercent(d) < 20 {
 		return fmt.Errorf("Low free space on %s. Free disk space: %2.1f %%", path, spaceAvailablePercent)
@@ -25,29 +26,33 @@ func rootDiskSpaceCheck() error {
 	return diskSpaceCheck(baseDir + "/")
 }
 
-func bootDiskSpaceCheck() error {
-	return diskSpaceCheck(baseDir + "/boot")
+func mountedDiskSpaceCheck() error {
+	path := baseDir + "/vol"
+	if _, err := os.Stat(path); err != nil && os.IsNotExist(err) {
+		return nil
+	}
+	return diskSpaceCheck(path)
 }
 
 func DiskChecks(checks *[]fthealth.Check) {
 	rootDiskSpaceCheck := fthealth.Check{
-		BusinessImpact:   "No newspaper",
+		BusinessImpact:   "A part of the publishing workflow might be effected",
 		Name:             "Root disk space check.",
-		PanicGuide:       "Keep calm and carry on",
+		PanicGuide:       "Please refer to technical summary",
 		Severity:         2,
-		TechnicalSummary: "rm -rf some shit",
+		TechnicalSummary: "Please clear some disk space on the 'root' mount",
 		Checker:          rootDiskSpaceCheck,
 	}
 
-	bootDiskSpaceCheck := fthealth.Check{
-		BusinessImpact:   "No newspaper",
-		Name:             "Boot disk space check",
-		PanicGuide:       "Keep calm and carry on",
+	mountedDiskSpaceCheck := fthealth.Check{
+		BusinessImpact:   "A part of the publishing workflow might be effected",
+		Name:             "Persistent disk space check mounted on '/vol' (always true for stateless nodes)",
+		PanicGuide:       "Please refer to technical summary",
 		Severity:         2,
-		TechnicalSummary: "rm -rf some shit",
-		Checker:          bootDiskSpaceCheck,
+		TechnicalSummary: "Please clear some disk space on the 'vol' mount",
+		Checker:          mountedDiskSpaceCheck,
 	}
 
 	*checks = append(*checks, rootDiskSpaceCheck)
-	*checks = append(*checks, bootDiskSpaceCheck)
+	*checks = append(*checks, mountedDiskSpaceCheck)
 }
