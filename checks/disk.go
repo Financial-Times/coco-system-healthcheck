@@ -17,7 +17,7 @@ func diskSpaceCheck(path string) error {
 		return fmt.Errorf("Cannot read disk info of %s file system.", path)
 	}
 	if spaceAvailablePercent(d) < 20 {
-		return fmt.Errorf("Low free space on %s. Free disk space: %2.1f %%", path, spaceAvailablePercent)
+		return fmt.Errorf("Low free space on %s. Free disk space: %2.1f %%", path, spaceAvailablePercent(d))
 	}
 	return nil
 }
