@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/Financial-Times/go-fthealth"
 	linuxproc "github.com/c9s/goprocinfo/linux"
-	"log"
+	"os"
 )
 
 func spaceAvailablePercent(disk *linuxproc.Disk) float64 {
@@ -14,8 +14,7 @@ func spaceAvailablePercent(disk *linuxproc.Disk) float64 {
 func diskSpaceCheck(path string) error {
 	d, err := linuxproc.ReadDisk(path)
 	if err != nil {
-		log.Printf("Cannot read disk info of %s file system.", path)
-		return nil
+		return fmt.Errorf("Cannot read disk info of %s file system.", path)
 	}
 	if spaceAvailablePercent(d) < 20 {
 		return fmt.Errorf("Low free space on %s. Free disk space: %2.1f %%", path, spaceAvailablePercent)
@@ -28,7 +27,11 @@ func rootDiskSpaceCheck() error {
 }
 
 func mountedDiskSpaceCheck() error {
-	return diskSpaceCheck(baseDir + "/vol")
+	path := baseDir + "/vol"
+	if _, err := os.Stat(path); err != nil && os.IsNotExist(err) {
+		return nil
+	}
+	return diskSpaceCheck(path)
 }
 
 func DiskChecks(checks *[]fthealth.Check) {
