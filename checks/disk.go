@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Financial-Times/go-fthealth"
 	linuxproc "github.com/c9s/goprocinfo/linux"
+	"log"
 )
 
 func spaceAvailablePercent(disk *linuxproc.Disk) float64 {
@@ -13,7 +14,8 @@ func spaceAvailablePercent(disk *linuxproc.Disk) float64 {
 func diskSpaceCheck(path string) error {
 	d, err := linuxproc.ReadDisk(path)
 	if err != nil {
-		return fmt.Errorf("Cannot read disk info of volume mounted under %s.", path)
+		log.Printf("Cannot read disk info of %s file system.", path)
+		return nil
 	}
 	if spaceAvailablePercent(d) < 20 {
 		return fmt.Errorf("Low free space on %s. Free disk space: %2.1f %%", path, spaceAvailablePercent)
@@ -25,8 +27,8 @@ func rootDiskSpaceCheck() error {
 	return diskSpaceCheck(baseDir + "/")
 }
 
-func bootDiskSpaceCheck() error {
-	return diskSpaceCheck(baseDir + "/boot")
+func mountedDiskSpaceCheck() error {
+	return diskSpaceCheck(baseDir + "/vol")
 }
 
 func DiskChecks(checks *[]fthealth.Check) {
@@ -39,15 +41,15 @@ func DiskChecks(checks *[]fthealth.Check) {
 		Checker:          rootDiskSpaceCheck,
 	}
 
-	bootDiskSpaceCheck := fthealth.Check{
+	mountedDiskSpaceCheck := fthealth.Check{
 		BusinessImpact:   "No newspaper",
-		Name:             "Boot disk space check",
+		Name:             "Mounted disk space check (/vol)",
 		PanicGuide:       "Keep calm and carry on",
 		Severity:         2,
 		TechnicalSummary: "rm -rf some shit",
-		Checker:          bootDiskSpaceCheck,
+		Checker:          mountedDiskSpaceCheck,
 	}
 
 	*checks = append(*checks, rootDiskSpaceCheck)
-	*checks = append(*checks, bootDiskSpaceCheck)
+	*checks = append(*checks, mountedDiskSpaceCheck)
 }
