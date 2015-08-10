@@ -27,7 +27,7 @@ func avMemoryCheck() error {
 
 func MemInfo(checks *[]fthealth.Check) {
 	memAvCheck := fthealth.Check{
-		BusinessImpact:   "A part of the publishing workflow might be effected",
+		BusinessImpact:   "A part of the publishing workflow might be affected",
 		Name:             "Memory load check",
 		PanicGuide:       "Please refer to technical summary",
 		Severity:         2,

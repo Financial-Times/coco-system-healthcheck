@@ -22,7 +22,7 @@ func loadAvgCheck() error {
 
 func LoadAvg(checks *[]fthealth.Check) {
 	loadAvgCheck := fthealth.Check{
-		BusinessImpact:   "A part of the publishing workflow might be effected",
+		BusinessImpact:   "A part of the publishing workflow might be affected",
 		Name:             "CPU load average check",
 		PanicGuide:       "Please refer to technical summary",
 		Severity:         2,
