@@ -27,11 +27,11 @@ func avMemoryCheck() error {
 
 func MemInfo(checks *[]fthealth.Check) {
 	memAvCheck := fthealth.Check{
-		BusinessImpact:   "No newspaper",
+		BusinessImpact:   "A part of the publishing workflow might be effected",
 		Name:             "Memory load check",
-		PanicGuide:       "Keep calm and carry on",
+		PanicGuide:       "Please refer to technical summary",
 		Severity:         2,
-		TechnicalSummary: "Spin up more boxes",
+		TechnicalSummary: "Check the memory usage of services/containers on this host, please proceed conform these values.",
 		Checker:          avMemoryCheck,
 	}
 	*checks = append(*checks, memAvCheck)
