@@ -24,7 +24,7 @@ func LoadAvg(checks *[]fthealth.Check) {
 	loadAvgCheck := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be effected",
 		Name:             "CPU load average check",
-		PanicGuide:       "Please refer to the technical summary",
+		PanicGuide:       "Please refer to technical summary",
 		Severity:         2,
 		TechnicalSummary: "CPU is quite busy lately. This might not be a problem if it happens intermittently, however if it persists consider upgrading or adding new boxes.",
 		Checker:          loadAvgCheck,
