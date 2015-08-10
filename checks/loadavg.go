@@ -22,11 +22,11 @@ func loadAvgCheck() error {
 
 func LoadAvg(checks *[]fthealth.Check) {
 	loadAvgCheck := fthealth.Check{
-		BusinessImpact:   "No newspaper soon...",
-		Name:             "Load avg check",
-		PanicGuide:       "Keep calm and carry on",
+		BusinessImpact:   "A part of the publishing workflow might be affected",
+		Name:             "CPU load average check",
+		PanicGuide:       "Please refer to technical summary",
 		Severity:         2,
-		TechnicalSummary: "CPU is quite busy, has too much work. Profile the services or spin up more boxes",
+		TechnicalSummary: "CPU is quite busy lately. This might not be a problem if it happens intermittently, however if it persists consider upgrading or adding new boxes.",
 		Checker:          loadAvgCheck,
 	}
 
