@@ -17,7 +17,7 @@ func diskSpaceCheck(path string) error {
 		return fmt.Errorf("Cannot read disk info of %s file system.", path)
 	}
 	if spaceAvailablePercent(d) < 20 {
-		return fmt.Errorf("Low free space on %s. Free disk space: %2.1f %%", path, spaceAvailablePercent)
+		return fmt.Errorf("Low free space on %s. Free disk space: %2.1f %%", path, spaceAvailablePercent(d))
 	}
 	return nil
 }
@@ -36,8 +36,8 @@ func mountedDiskSpaceCheck() error {
 
 func DiskChecks(checks *[]fthealth.Check) {
 	rootDiskSpaceCheck := fthealth.Check{
-		BusinessImpact:   "A part of the publishing workflow might be effected",
-		Name:             "Root disk space check.",
+		BusinessImpact:   "A part of the publishing workflow might be affected",
+		Name:             "Root disk space check",
 		PanicGuide:       "Please refer to technical summary",
 		Severity:         2,
 		TechnicalSummary: "Please clear some disk space on the 'root' mount",
