@@ -14,7 +14,7 @@ func loadAvgCheck() error {
 	}
 
 	if l.Last5Min > 1.5 || l.Last15Min > 0.9 {
-		return fmt.Errorf("Load avg is above the recommended threshold: Last1Min: %2.2f , Last5Min: %2.2f, Last15Min: %2.2f", l.Last1Min, l.Last5Min, l.Last15Min)
+		return fmt.Errorf("Load avg is above the recommended threshold: Last5Min: %2.2f, Last15Min: %2.2f", l.Last5Min, l.Last15Min)
 	}
 
 	return nil
