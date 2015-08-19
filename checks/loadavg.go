@@ -13,7 +13,7 @@ func loadAvgCheck() error {
 		return fmt.Errorf("Couldn't read loadavg data")
 	}
 
-	if l.Last1Min > 5.0 || l.Last5Min > 1.0 || l.Last15Min > 0.7 {
+	if l.Last5Min > 1.5 || l.Last15Min > 0.9 {
 		return fmt.Errorf("Load avg is above the recommended threshold: Last1Min: %2.2f , Last5Min: %2.2f, Last15Min: %2.2f", l.Last1Min, l.Last5Min, l.Last15Min)
 	}
 
