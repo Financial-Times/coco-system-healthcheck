@@ -1,8 +1,8 @@
 package main
 
 import (
-	healthchecks "./checks"
 	"flag"
+	healthchecks "github.com/Financial-Times/coco-system-healthcheck/checks"
 	"github.com/Financial-Times/go-fthealth"
 	"github.com/gorilla/mux"
 	"net/http"
