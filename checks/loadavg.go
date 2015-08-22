@@ -13,7 +13,16 @@ func loadAvgCheck() error {
 		return fmt.Errorf("Couldn't read loadavg data")
 	}
 
-	if l.Last5Min > 1.5 || l.Last15Min > 0.9 {
+	cpuInfo, err := linuxproc.ReadCPUInfo(baseDir + "/proc/cpuinfo")
+
+	if err != nil {
+		return fmt.Errorf("Couldn't read cpuinfo data")
+	}
+
+	fiveMinLimit := (1.5 * float64(cpuInfo.NumCPU()))
+	fifteenMinLimit := (0.9 * float64(cpuInfo.NumCPU()))
+
+	if l.Last5Min > fiveMinLimit || l.Last15Min > fifteenMinLimit {
 		return fmt.Errorf("Load avg is above the recommended threshold: Last5Min: %2.2f, Last15Min: %2.2f", l.Last5Min, l.Last15Min)
 	}
 
