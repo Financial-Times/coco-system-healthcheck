@@ -11,4 +11,5 @@ func RegisterChecks(path string, checks *[]fthealth.Check) {
 	DiskFreeChecks(checks)
 	MemInfo(checks)
 	LoadAvg(checks)
+	DiskInodes(checks)
 }
