@@ -1,4 +1,4 @@
-package checks
+package main
 
 import (
 	"fmt"
@@ -34,7 +34,7 @@ func mountedDiskSpaceCheck() error {
 	return diskSpaceCheck(path)
 }
 
-func DiskChecks(checks *[]fthealth.Check) {
+func DiskFreeChecks(checks *[]fthealth.Check) {
 	rootDiskSpaceCheck := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be affected",
 		Name:             "Root disk space check",
