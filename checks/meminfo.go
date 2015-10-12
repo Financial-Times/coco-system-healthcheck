@@ -6,16 +6,11 @@ import (
 	linuxproc "github.com/c9s/goprocinfo/linux"
 )
 
-func meminfo() linuxproc.MemInfo {
+func avMemoryCheck() error {
 	meminfo, err := linuxproc.ReadMemInfo(baseDir + "/proc/meminfo")
 	if err != nil {
-		fmt.Errorf("meminfo read fail")
+		return err
 	}
-	return *meminfo
-}
-
-func avMemoryCheck() error {
-	meminfo := meminfo()
 	available := meminfo.MemAvailable
 	total := meminfo.MemTotal
 	availablePercent := float64(available) / float64(total) * 100
