@@ -6,7 +6,22 @@ import (
 	linuxproc "github.com/c9s/goprocinfo/linux"
 )
 
-func loadAvgCheck() error {
+type loadAverageChecker struct{}
+
+func (lac loadAverageChecker) Checks() []fthealth.Check {
+	check := fthealth.Check{
+		BusinessImpact:   "A part of the publishing workflow might be affected",
+		Name:             "CPU load average check",
+		PanicGuide:       "Please refer to technical summary",
+		Severity:         2,
+		TechnicalSummary: "CPU is quite busy lately. This might not be a problem if it happens intermittently, however if it persists consider upgrading or adding new boxes.",
+		Checker:          lac.doCheck,
+	}
+
+	return []fthealth.Check{check}
+}
+
+func (lac loadAverageChecker) doCheck() error {
 	l, err := linuxproc.ReadLoadAvg(*hostPath + "/proc/loadavg")
 
 	if err != nil {
@@ -27,17 +42,4 @@ func loadAvgCheck() error {
 	}
 
 	return nil
-}
-
-func LoadAvg(checks *[]fthealth.Check) {
-	loadAvgCheck := fthealth.Check{
-		BusinessImpact:   "A part of the publishing workflow might be affected",
-		Name:             "CPU load average check",
-		PanicGuide:       "Please refer to technical summary",
-		Severity:         2,
-		TechnicalSummary: "CPU is quite busy lately. This might not be a problem if it happens intermittently, however if it persists consider upgrading or adding new boxes.",
-		Checker:          loadAvgCheck,
-	}
-
-	*checks = append(*checks, loadAvgCheck)
 }
