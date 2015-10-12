@@ -4,10 +4,7 @@ import (
 	fthealth "github.com/Financial-Times/go-fthealth"
 )
 
-var baseDir string
-
-func RegisterChecks(path string, checks *[]fthealth.Check) {
-	baseDir = path
+func RegisterChecks(checks *[]fthealth.Check) {
 	DiskFreeChecks(checks)
 	MemInfo(checks)
 	LoadAvg(checks)

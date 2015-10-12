@@ -19,11 +19,11 @@ func inodeCheck(path string) error {
 }
 
 func rootInodesCheck() error {
-	return inodeCheck(baseDir + "/")
+	return inodeCheck(*hostPath + "/")
 }
 
 func mountedInodesCheck() error {
-	path := baseDir + "/vol"
+	path := *hostPath + "/vol"
 	if _, err := os.Stat(path); err != nil && os.IsNotExist(err) {
 		return nil
 	}

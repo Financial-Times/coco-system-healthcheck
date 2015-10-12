@@ -9,7 +9,7 @@ import (
 )
 
 func iops(name string) (uint64, error) {
-	stats, err := linuxproc.ReadDiskStats(baseDir + "/proc/diskstats")
+	stats, err := linuxproc.ReadDiskStats(*hostPath + "/proc/diskstats")
 	if err != nil {
 		log.Fatalf("Cannot read disk stat info for %v\n", err)
 	}

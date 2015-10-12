@@ -15,7 +15,7 @@ var (
 func main() {
 	flag.Parse()
 
-	RegisterChecks(*hostPath, &checks)
+	RegisterChecks(&checks)
 
 	mux := mux.NewRouter()
 	mux.HandleFunc("/__health", fthealth.Handler("myserver", "a server", checks...))

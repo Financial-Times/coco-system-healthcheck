@@ -23,11 +23,11 @@ func diskSpaceCheck(path string) error {
 }
 
 func rootDiskSpaceCheck() error {
-	return diskSpaceCheck(baseDir + "/")
+	return diskSpaceCheck(*hostPath + "/")
 }
 
 func mountedDiskSpaceCheck() error {
-	path := baseDir + "/vol"
+	path := *hostPath + "/vol"
 	if _, err := os.Stat(path); err != nil && os.IsNotExist(err) {
 		return nil
 	}

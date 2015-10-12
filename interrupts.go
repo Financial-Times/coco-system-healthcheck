@@ -8,9 +8,9 @@ import (
 )
 
 func count() uint64 {
-	d, err := linuxproc.ReadStat(baseDir + "/proc/stat")
+	d, err := linuxproc.ReadStat(*hostPath + "/proc/stat")
 	if err != nil {
-		panic(fmt.Sprintf("Cannot read disk info of %s file system.", baseDir+"/proc/stat"))
+		panic(fmt.Sprintf("Cannot read disk info of %s file system.", *hostPath+"/proc/stat"))
 	}
 	return d.Interrupts
 }

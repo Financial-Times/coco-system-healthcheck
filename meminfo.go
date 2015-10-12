@@ -7,7 +7,7 @@ import (
 )
 
 func avMemoryCheck() error {
-	meminfo, err := linuxproc.ReadMemInfo(baseDir + "/proc/meminfo")
+	meminfo, err := linuxproc.ReadMemInfo(*hostPath + "/proc/meminfo")
 	if err != nil {
 		return err
 	}
