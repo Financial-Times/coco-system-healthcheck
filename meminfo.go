@@ -1,4 +1,4 @@
-package checks
+package main
 
 import (
 	"fmt"
