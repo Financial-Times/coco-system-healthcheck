@@ -8,7 +8,27 @@ import (
 	"time"
 )
 
-func iops(name string) (uint64, error) {
+type iopsChecker struct {
+	threshold uint64
+}
+
+func (ic iopsChecker) Checks() []fthealth.Check {
+
+	go ic.updateIopsCount()
+
+	check := fthealth.Check{
+		BusinessImpact:   "System may become unresponsive",
+		Name:             "Iops check",
+		PanicGuide:       "Check the system with iostat and investigate cause",
+		Severity:         2,
+		TechnicalSummary: "Number of iops as reported by /proc/diskstat is unusually high",
+		Checker:          ic.iopsCheck,
+	}
+
+	return []fthealth.Check{check}
+}
+
+func (ic iopsChecker) iops(name string) (uint64, error) {
 	stats, err := linuxproc.ReadDiskStats(*hostPath + "/proc/diskstats")
 	if err != nil {
 		log.Fatalf("Cannot read disk stat info for %v\n", err)
@@ -22,7 +42,7 @@ func iops(name string) (uint64, error) {
 	return 0, fmt.Errorf("disk not found %v", name)
 }
 
-func iopsCheck() error {
+func (ic iopsChecker) iopsCheck() error {
 	perSec := <-latestPerSec
 	threshold := uint64(100)
 	if perSec > threshold {
@@ -33,7 +53,7 @@ func iopsCheck() error {
 
 var latestPerSec chan uint64 = make(chan uint64)
 
-func updateIopsCount() {
+func (ic iopsChecker) updateIopsCount() {
 	ticker := time.NewTicker(1 * time.Second)
 	latest := uint64(0)
 	prevInt := uint64(0)
@@ -41,7 +61,7 @@ func updateIopsCount() {
 		select {
 		case latestPerSec <- latest:
 		case <-ticker.C:
-			newInt, err := iops("sda")
+			newInt, err := ic.iops("sda")
 			if err != nil {
 				log.Print("failed to read IOPS : %v\n", err.Error())
 				continue
@@ -53,23 +73,4 @@ func updateIopsCount() {
 		}
 
 	}
-}
-
-func Iops(checks *[]fthealth.Check) {
-
-	go updateIopsCount()
-
-	impact := "System may become unresponsive"
-	panicGuide := "Check the system with iostat and investigate cause"
-
-	check := fthealth.Check{
-		BusinessImpact:   impact,
-		Name:             "Iops check",
-		PanicGuide:       panicGuide,
-		Severity:         2,
-		TechnicalSummary: "Number of iops as reported by /proc/diskstat is unusually high",
-		Checker:          iopsCheck,
-	}
-
-	*checks = append(*checks, check)
 }

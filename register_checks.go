@@ -11,5 +11,5 @@ func RegisterChecks(checks *[]fthealth.Check) {
 	DiskInodes(checks)
 	*checks = append(*checks, contextSwitchChecker{120000}.Checks()...)
 	*checks = append(*checks, interruptsChecker{3000}.Checks()...)
-	Iops(checks)
+	*checks = append(*checks, iopsChecker{100}.Checks()...)
 }
