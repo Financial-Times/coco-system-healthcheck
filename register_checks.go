@@ -10,6 +10,6 @@ func RegisterChecks(checks *[]fthealth.Check) {
 	LoadAvg(checks)
 	DiskInodes(checks)
 	*checks = append(*checks, contextSwitchChecker{120000}.Checks()...)
-	Interrupts(checks)
+	*checks = append(*checks, interruptsChecker{3000}.Checks()...)
 	Iops(checks)
 }
