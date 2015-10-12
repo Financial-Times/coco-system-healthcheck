@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	healthchecks "github.com/Financial-Times/coco-system-healthcheck/checks"
 	"github.com/Financial-Times/go-fthealth"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -16,7 +15,7 @@ var (
 func main() {
 	flag.Parse()
 
-	healthchecks.RegisterChecks(*hostPath, &checks)
+	RegisterChecks(*hostPath, &checks)
 
 	mux := mux.NewRouter()
 	mux.HandleFunc("/__health", fthealth.Handler("myserver", "a server", checks...))
