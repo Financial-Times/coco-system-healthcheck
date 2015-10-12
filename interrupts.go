@@ -17,7 +17,7 @@ func count() uint64 {
 
 func intCheck() error {
 	perSec := <-latestIntPerSec
-	threshold := uint64(10)
+	threshold := uint64(3000)
 	if perSec > threshold {
 		return fmt.Errorf("%d interrupts per second. (>%d)", perSec, threshold)
 	}
