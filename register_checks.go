@@ -9,7 +9,7 @@ func RegisterChecks(checks *[]fthealth.Check) {
 	MemInfo(checks)
 	LoadAvg(checks)
 	DiskInodes(checks)
-	ContextSwitches(checks)
+	*checks = append(*checks, contextSwitchChecker{120000}.Checks()...)
 	Interrupts(checks)
 	Iops(checks)
 }
