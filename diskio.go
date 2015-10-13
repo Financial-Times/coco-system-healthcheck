@@ -44,9 +44,8 @@ func (ic iopsChecker) iops(name string) (uint64, error) {
 
 func (ic iopsChecker) iopsCheck() error {
 	perSec := <-latestPerSec
-	threshold := uint64(100)
-	if perSec > threshold {
-		return fmt.Errorf("%d iops per second. (>%d)", perSec, threshold)
+	if perSec > ic.threshold {
+		return fmt.Errorf("%d iops per second. (>%d)", perSec, ic.threshold)
 	}
 	return nil
 }
