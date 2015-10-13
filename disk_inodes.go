@@ -7,30 +7,11 @@ import (
 	"os"
 )
 
-func inodeCheck(path string) error {
-	d, err := linuxproc.ReadDisk(path)
-	if err != nil {
-		return fmt.Errorf("Cannot read disk info of %s file system.", path)
-	}
-	if d.FreeInodes < 1024 {
-		return fmt.Errorf("Lack of free inodes on %s : %d (< 1024)", path, d.FreeInodes)
-	}
-	return nil
+type inodeChecker struct {
+	threshold uint64
 }
 
-func rootInodesCheck() error {
-	return inodeCheck(baseDir + "/")
-}
-
-func mountedInodesCheck() error {
-	path := baseDir + "/vol"
-	if _, err := os.Stat(path); err != nil && os.IsNotExist(err) {
-		return nil
-	}
-	return inodeCheck(path)
-}
-
-func DiskInodes(checks *[]fthealth.Check) {
+func (ic inodeChecker) Checks() []fthealth.Check {
 	impact := "Filesystem may appear full. Services that require the filesystem may stop"
 	panicGuide := "Check the filesystem with df -i <path> and investigate"
 
@@ -40,7 +21,7 @@ func DiskInodes(checks *[]fthealth.Check) {
 		PanicGuide:       panicGuide,
 		Severity:         2,
 		TechnicalSummary: "Please free some inodes on the 'root' mount",
-		Checker:          rootInodesCheck,
+		Checker:          ic.rootInodesCheck,
 	}
 
 	mountedCheck := fthealth.Check{
@@ -49,9 +30,31 @@ func DiskInodes(checks *[]fthealth.Check) {
 		PanicGuide:       panicGuide,
 		Severity:         2,
 		TechnicalSummary: "Please clear some inodes on the 'vol' mount",
-		Checker:          mountedInodesCheck,
+		Checker:          ic.mountedInodesCheck,
 	}
 
-	*checks = append(*checks, rootCheck)
-	*checks = append(*checks, mountedCheck)
+	return []fthealth.Check{rootCheck, mountedCheck}
+}
+
+func (ic inodeChecker) inodeCheck(path string) error {
+	d, err := linuxproc.ReadDisk(path)
+	if err != nil {
+		return fmt.Errorf("Cannot read disk info of %s file system.", path)
+	}
+	if d.FreeInodes < ic.threshold {
+		return fmt.Errorf("Lack of free inodes on %s : %d (< %d)", path, d.FreeInodes, ic.threshold)
+	}
+	return nil
+}
+
+func (ic inodeChecker) rootInodesCheck() error {
+	return ic.inodeCheck(*hostPath + "/")
+}
+
+func (ic inodeChecker) mountedInodesCheck() error {
+	path := *hostPath + "/vol"
+	if _, err := os.Stat(path); err != nil && os.IsNotExist(err) {
+		return nil
+	}
+	return ic.inodeCheck(path)
 }

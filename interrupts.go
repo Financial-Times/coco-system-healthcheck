@@ -7,17 +7,37 @@ import (
 	"time"
 )
 
-func count() uint64 {
-	d, err := linuxproc.ReadStat(baseDir + "/proc/stat")
+type interruptsChecker struct {
+	threshold uint64
+}
+
+func (ic interruptsChecker) Checks() []fthealth.Check {
+
+	go ic.updateIntCount()
+
+	check := fthealth.Check{
+		BusinessImpact:   "System may become unresponsive",
+		Name:             "Interrupts check",
+		PanicGuide:       "Check the system with vmstat and investigate cause",
+		Severity:         2,
+		TechnicalSummary: "Number of interrupts as reported by /proc/stat is unusually high",
+		Checker:          ic.intCheck,
+	}
+
+	return []fthealth.Check{check}
+}
+
+func (ic interruptsChecker) count() uint64 {
+	d, err := linuxproc.ReadStat(*hostPath + "/proc/stat")
 	if err != nil {
-		panic(fmt.Sprintf("Cannot read disk info of %s file system.", baseDir+"/proc/stat"))
+		panic(fmt.Sprintf("Cannot read disk info of %s file system.", *hostPath+"/proc/stat"))
 	}
 	return d.Interrupts
 }
 
-func intCheck() error {
+func (ic interruptsChecker) intCheck() error {
 	perSec := <-latestIntPerSec
-	threshold := uint64(3000)
+	threshold := uint64(ic.threshold)
 	if perSec > threshold {
 		return fmt.Errorf("%d interrupts per second. (>%d)", perSec, threshold)
 	}
@@ -26,7 +46,7 @@ func intCheck() error {
 
 var latestIntPerSec chan uint64 = make(chan uint64)
 
-func updateIntCount() {
+func (ic interruptsChecker) updateIntCount() {
 	ticker := time.NewTicker(1 * time.Second)
 	latestPerSec := uint64(0)
 	prevInt := uint64(0)
@@ -34,7 +54,7 @@ func updateIntCount() {
 		select {
 		case latestIntPerSec <- latestPerSec:
 		case <-ticker.C:
-			newInt := count()
+			newInt := ic.count()
 			if prevInt != 0 {
 				latestPerSec = newInt - prevInt
 			}
@@ -42,23 +62,4 @@ func updateIntCount() {
 		}
 
 	}
-}
-
-func Interrupts(checks *[]fthealth.Check) {
-
-	go updateIntCount()
-
-	impact := "System may become unresponsive"
-	panicGuide := "Check the system with vmstat and investigate cause"
-
-	check := fthealth.Check{
-		BusinessImpact:   impact,
-		Name:             "Interrupts check",
-		PanicGuide:       panicGuide,
-		Severity:         2,
-		TechnicalSummary: "Number of interrupts as reported by /proc/stat is unusually high",
-		Checker:          intCheck,
-	}
-
-	*checks = append(*checks, check)
 }
