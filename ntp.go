@@ -12,10 +12,10 @@ type ntpChecker struct{}
 func (ntpc ntpChecker) Checks() []fthealth.Check {
 	ntpCheck := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be affected",
-		Name:             "Root disk space check",
+		Name:             "NTP sync check",
 		PanicGuide:       "Please refer to technical summary",
 		Severity:         2,
-		TechnicalSummary: "Please clear some disk space on the 'root' mount",
+		TechnicalSummary: "System time has drifted out of sync of the box, investigate `timedatectl` and `systemd-timesyncd.service`",
 		Checker:          ntpc.Check,
 	}
 	return []fthealth.Check{ntpCheck}
