@@ -26,7 +26,7 @@ func (ntpc ntpChecker) Check() error {
 		cmdOut []byte
 		err    error
 	)
-	if cmdOut, err = exec.Command("timedatectl").Output(); err != nil {
+	if cmdOut, err = exec.Command("/usr/bin/timedatectl").Output(); err != nil {
 		return fmt.Errorf("Could not run `timedatectl`")
 	}
 	out := string(cmdOut)
