@@ -4,6 +4,7 @@ import (
 	"flag"
 	"github.com/Financial-Times/go-fthealth"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 )
 
@@ -27,6 +28,7 @@ func main() {
 	mux := mux.NewRouter()
 	mux.HandleFunc("/__health", fthealth.Handler("myserver", "a server", checks...))
 
+	log.Printf("Starting http server on 8080\n")
 	err := http.ListenAndServe(":8080", mux)
 	if err != nil {
 		panic(err)
