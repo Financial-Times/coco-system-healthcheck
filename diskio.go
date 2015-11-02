@@ -37,7 +37,6 @@ func (ic iopsChecker) iops(name string) (uint64, error) {
 		if stat.Name == name {
 			return stat.WriteIOs + stat.ReadIOs, nil
 		}
-		println(stat.Name)
 	}
 	return 0, fmt.Errorf("disk not found %v", name)
 }
