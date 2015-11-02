@@ -37,7 +37,6 @@ func (ic iopsChecker) iops(name string) (uint64, error) {
 		if stat.Name == name {
 			return stat.WriteIOs + stat.ReadIOs, nil
 		}
-		println(stat.Name)
 	}
 	return 0, fmt.Errorf("disk not found %v", name)
 }
@@ -60,9 +59,9 @@ func (ic iopsChecker) updateIopsCount() {
 		select {
 		case latestPerSec <- latest:
 		case <-ticker.C:
-			newInt, err := ic.iops("sda")
+			newInt, err := ic.iops("xvda")
 			if err != nil {
-				log.Print("failed to read IOPS : %v\n", err.Error())
+				log.Printf("failed to read IOPS : %v\n", err.Error())
 				continue
 			}
 			if prevInt != 0 {
