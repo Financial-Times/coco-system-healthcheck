@@ -59,7 +59,7 @@ func (ic iopsChecker) updateIopsCount() {
 		select {
 		case latestPerSec <- latest:
 		case <-ticker.C:
-			newInt, err := ic.iops("sda")
+			newInt, err := ic.iops("xvda")
 			if err != nil {
 				log.Printf("failed to read IOPS : %v\n", err.Error())
 				continue
