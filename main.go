@@ -21,7 +21,7 @@ func main() {
 	checks = append(checks, loadAverageChecker{}.Checks()...)
 	checks = append(checks, inodeChecker{1024}.Checks()...)
 	checks = append(checks, contextSwitchChecker{120000}.Checks()...)
-	checks = append(checks, interruptsChecker{3000}.Checks()...)
+	checks = append(checks, interruptsChecker{10000}.Checks()...)
 	checks = append(checks, iopsChecker{100}.Checks()...)
 
 	mux := mux.NewRouter()
