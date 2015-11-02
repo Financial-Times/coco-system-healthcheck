@@ -61,7 +61,7 @@ func (ic iopsChecker) updateIopsCount() {
 		case <-ticker.C:
 			newInt, err := ic.iops("sda")
 			if err != nil {
-				log.Print("failed to read IOPS : %v\n", err.Error())
+				log.Printf("failed to read IOPS : %v\n", err.Error())
 				continue
 			}
 			if prevInt != 0 {
