@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"github.com/Financial-Times/go-fthealth"
+	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"

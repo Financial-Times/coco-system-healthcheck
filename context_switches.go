@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/Financial-Times/go-fthealth"
+	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	linuxproc "github.com/c9s/goprocinfo/linux"
 	"time"
 )
@@ -35,12 +35,12 @@ func (csc contextSwitchChecker) count() uint64 {
 	return d.ContextSwitches
 }
 
-func (csc contextSwitchChecker) ctxCheck() error {
+func (csc contextSwitchChecker) ctxCheck() (string, error) {
 	perSec := <-latestIntPerSec
 	if perSec > csc.threshold {
-		return fmt.Errorf("%d context switches per second. (>%d)", perSec, csc.threshold)
+		return fmt.Sprintf("%d", perSec), fmt.Errorf("%d context switches per second. (>%d)", perSec, csc.threshold)
 	}
-	return nil
+	return fmt.Sprintf("%d", perSec), nil
 }
 
 var latestCsPerSec chan uint64 = make(chan uint64)

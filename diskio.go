@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/Financial-Times/go-fthealth"
+	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	linuxproc "github.com/c9s/goprocinfo/linux"
 	"log"
 	"time"
@@ -41,12 +41,12 @@ func (ic iopsChecker) iops(name string) (uint64, error) {
 	return 0, fmt.Errorf("disk not found %v", name)
 }
 
-func (ic iopsChecker) iopsCheck() error {
+func (ic iopsChecker) iopsCheck() (string, error) {
 	perSec := <-latestPerSec
 	if perSec > ic.threshold {
-		return fmt.Errorf("%d iops per second. (>%d)", perSec, ic.threshold)
+		return fmt.Sprintf("%d", perSec), fmt.Errorf("%d iops per second. (>%d)", perSec, ic.threshold)
 	}
-	return nil
+	return fmt.Sprintf("%d", perSec), nil
 }
 
 var latestPerSec chan uint64 = make(chan uint64)

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/Financial-Times/go-fthealth"
+	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	linuxproc "github.com/c9s/goprocinfo/linux"
 	"os"
 )
@@ -33,26 +33,26 @@ func (dff diskFreeChecker) Checks() []fthealth.Check {
 	return []fthealth.Check{rootCheck, mountedCheck}
 }
 
-func (dff diskFreeChecker) diskSpaceCheck(path string) error {
+func (dff diskFreeChecker) diskSpaceCheck(path string) (string, error) {
 	d, err := linuxproc.ReadDisk(path)
 	if err != nil {
-		return fmt.Errorf("Cannot read disk info of %s file system.", path)
+		return "", fmt.Errorf("Cannot read disk info of %s file system.", path)
 	}
 	pctAvail := (float64(d.Free) / float64(d.All) * 100)
 	if pctAvail < dff.thresholdPercent {
-		return fmt.Errorf("Low free space on %s. Free disk space: %2.1f %%", path, pctAvail)
+		return fmt.Sprintf("%2.1f %%", pctAvail), fmt.Errorf("Low free space on %s. Free disk space: %2.1f %%", path, pctAvail)
 	}
-	return nil
+	return fmt.Sprintf("%2.1f %%", pctAvail), nil
 }
 
-func (dff diskFreeChecker) rootDiskSpaceCheck() error {
+func (dff diskFreeChecker) rootDiskSpaceCheck() (string, error) {
 	return dff.diskSpaceCheck(*hostPath + "/")
 }
 
-func (dff diskFreeChecker) mountedDiskSpaceCheck() error {
+func (dff diskFreeChecker) mountedDiskSpaceCheck() (string, error) {
 	path := *hostPath + "/vol"
 	if _, err := os.Stat(path); err != nil && os.IsNotExist(err) {
-		return nil
+		return "", nil
 	}
 	return dff.diskSpaceCheck(path)
 }

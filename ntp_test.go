@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 )
 
@@ -32,9 +31,9 @@ func TestNTPCheck(t *testing.T) {
 		offset offsetResult
 		err    error
 	}{
-		{offsetResult{val: 0}, nil},
-		{offsetResult{val: 101}, fmt.Errorf("offset is greater then limit of 100: 101")},
-		{offsetResult{val: -101}, fmt.Errorf("offset is greater then limit of 100: -101")},
+		{offsetResult{val: "0"}, nil},
+		{offsetResult{val: "101"}, fmt.Errorf("offset is greater then limit of 100: 101")},
+		{offsetResult{val: "-101"}, fmt.Errorf("offset is greater then limit of 100: -101")},
 	}
 
 	offsetCh = make(chan offsetResult)
@@ -45,9 +44,13 @@ func TestNTPCheck(t *testing.T) {
 			offsetCh <- test.offset
 		}()
 
-		err := ntpChecker.Check()
-		if err != test.err && !strings.Contains(err.Error(), test.err.Error()) {
+		val, err := ntpChecker.Check()
+		if err != test.err && err.Error() == test.err.Error() {
 			t.Fail()
+		}
+		if val != test.offset.val {
+			t.Errorf("Offset is: '%v', wanted: '%v'", val, test.offset.val)
+
 		}
 	}
 }

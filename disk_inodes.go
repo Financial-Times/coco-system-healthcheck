@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/Financial-Times/go-fthealth"
+	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	linuxproc "github.com/c9s/goprocinfo/linux"
 	"os"
 )
@@ -36,25 +36,25 @@ func (ic inodeChecker) Checks() []fthealth.Check {
 	return []fthealth.Check{rootCheck, mountedCheck}
 }
 
-func (ic inodeChecker) inodeCheck(path string) error {
+func (ic inodeChecker) inodeCheck(path string) (string, error) {
 	d, err := linuxproc.ReadDisk(path)
 	if err != nil {
-		return fmt.Errorf("Cannot read disk info of %s file system.", path)
+		return "", fmt.Errorf("Cannot read disk info of %s file system.", path)
 	}
 	if d.FreeInodes < ic.threshold {
-		return fmt.Errorf("Lack of free inodes on %s : %d (< %d)", path, d.FreeInodes, ic.threshold)
+		return fmt.Sprintf("%d", d.FreeInodes), fmt.Errorf("Lack of free inodes on %s : %d (< %d)", path, d.FreeInodes, ic.threshold)
 	}
-	return nil
+	return fmt.Sprintf("%d", d.FreeInodes), nil
 }
 
-func (ic inodeChecker) rootInodesCheck() error {
+func (ic inodeChecker) rootInodesCheck() (string, error) {
 	return ic.inodeCheck(*hostPath + "/")
 }
 
-func (ic inodeChecker) mountedInodesCheck() error {
+func (ic inodeChecker) mountedInodesCheck() (string, error) {
 	path := *hostPath + "/vol"
 	if _, err := os.Stat(path); err != nil && os.IsNotExist(err) {
-		return nil
+		return "", nil
 	}
 	return ic.inodeCheck(path)
 }
