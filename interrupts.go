@@ -8,10 +8,12 @@ import (
 )
 
 type interruptsChecker struct {
-	threshold uint64
+	threshold       uint64
+	latestIntPerSec chan uint64
 }
 
 func (ic interruptsChecker) Checks() []fthealth.Check {
+	ic.latestIntPerSec = make(chan uint64)
 
 	go ic.updateIntCount()
 
@@ -36,7 +38,7 @@ func (ic interruptsChecker) count() uint64 {
 }
 
 func (ic interruptsChecker) intCheck() (string, error) {
-	perSec := <-latestIntPerSec
+	perSec := <-ic.latestIntPerSec
 	threshold := uint64(ic.threshold)
 	if perSec > threshold {
 		return fmt.Sprintf("%d", perSec), fmt.Errorf("%d interrupts per second. (>%d)", perSec, threshold)
@@ -44,15 +46,13 @@ func (ic interruptsChecker) intCheck() (string, error) {
 	return fmt.Sprintf("%d", perSec), nil
 }
 
-var latestIntPerSec chan uint64 = make(chan uint64)
-
 func (ic interruptsChecker) updateIntCount() {
 	ticker := time.NewTicker(1 * time.Second)
 	latestPerSec := uint64(0)
 	prevInt := uint64(0)
 	for {
 		select {
-		case latestIntPerSec <- latestPerSec:
+		case ic.latestIntPerSec <- latestPerSec:
 		case <-ticker.C:
 			newInt := ic.count()
 			if prevInt != 0 {

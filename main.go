@@ -20,8 +20,8 @@ func main() {
 	checks = append(checks, memoryChecker{20}.Checks()...)
 	checks = append(checks, loadAverageChecker{}.Checks()...)
 	checks = append(checks, inodeChecker{1024}.Checks()...)
-	checks = append(checks, contextSwitchChecker{120000}.Checks()...)
-	checks = append(checks, interruptsChecker{10000}.Checks()...)
+	checks = append(checks, contextSwitchChecker{threshold: 120000}.Checks()...)
+	checks = append(checks, interruptsChecker{threshold: 10000}.Checks()...)
 	checks = append(checks, iopsChecker{100}.Checks()...)
 	checks = append(checks, ntpChecker{}.Checks()...)
 

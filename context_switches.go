@@ -8,10 +8,12 @@ import (
 )
 
 type contextSwitchChecker struct {
-	threshold uint64
+	threshold      uint64
+	latestCsPerSec chan uint64
 }
 
 func (csc contextSwitchChecker) Checks() []fthealth.Check {
+	csc.latestCsPerSec = make(chan uint64)
 
 	go csc.updateCsCount()
 
@@ -36,14 +38,12 @@ func (csc contextSwitchChecker) count() uint64 {
 }
 
 func (csc contextSwitchChecker) ctxCheck() (string, error) {
-	perSec := <-latestIntPerSec
+	perSec := <-csc.latestCsPerSec
 	if perSec > csc.threshold {
 		return fmt.Sprintf("%d", perSec), fmt.Errorf("%d context switches per second. (>%d)", perSec, csc.threshold)
 	}
 	return fmt.Sprintf("%d", perSec), nil
 }
-
-var latestCsPerSec chan uint64 = make(chan uint64)
 
 func (csc contextSwitchChecker) updateCsCount() {
 	ticker := time.NewTicker(1 * time.Second)
@@ -51,7 +51,7 @@ func (csc contextSwitchChecker) updateCsCount() {
 	prevInt := uint64(0)
 	for {
 		select {
-		case latestCsPerSec <- latestPerSec:
+		case csc.latestCsPerSec <- latestPerSec:
 		case <-ticker.C:
 			newInt := csc.count()
 			if prevInt != 0 {
