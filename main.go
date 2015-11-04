@@ -22,7 +22,7 @@ func main() {
 	checks = append(checks, inodeChecker{1024}.Checks()...)
 	checks = append(checks, contextSwitchChecker{threshold: 120000}.Checks()...)
 	checks = append(checks, interruptsChecker{threshold: 10000}.Checks()...)
-	checks = append(checks, iopsChecker{100}.Checks()...)
+	checks = append(checks, iopsChecker{200}.Checks()...)
 	checks = append(checks, ntpChecker{}.Checks()...)
 
 	mux := mux.NewRouter()
