@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/Financial-Times/go-fthealth"
+	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	linuxproc "github.com/c9s/goprocinfo/linux"
 )
 
@@ -21,25 +21,25 @@ func (lac loadAverageChecker) Checks() []fthealth.Check {
 	return []fthealth.Check{check}
 }
 
-func (lac loadAverageChecker) doCheck() error {
+func (lac loadAverageChecker) doCheck() (string, error) {
 	l, err := linuxproc.ReadLoadAvg(*hostPath + "/proc/loadavg")
 
 	if err != nil {
-		return fmt.Errorf("Couldn't read loadavg data")
+		return "", fmt.Errorf("Couldn't read loadavg data")
 	}
 
 	cpuInfo, err := linuxproc.ReadCPUInfo(*hostPath + "/proc/cpuinfo")
 
 	if err != nil {
-		return fmt.Errorf("Couldn't read cpuinfo data")
+		return "", fmt.Errorf("Couldn't read cpuinfo data")
 	}
 
 	fiveMinLimit := (1.5 * float64(cpuInfo.NumCPU()))
 	fifteenMinLimit := (0.9 * float64(cpuInfo.NumCPU()))
 
 	if l.Last5Min > fiveMinLimit || l.Last15Min > fifteenMinLimit {
-		return fmt.Errorf("Load avg is above the recommended threshold: Last5Min: %2.2f, Last15Min: %2.2f", l.Last5Min, l.Last15Min)
+		return fmt.Sprintf("Last5Min: %2.2f, Last15Min: %2.2f", l.Last5Min, l.Last15Min), fmt.Errorf("Load avg is above the recommended threshold: Last5Min: %2.2f, Last15Min: %2.2f", l.Last5Min, l.Last15Min)
 	}
 
-	return nil
+	return fmt.Sprintf("Last5Min: %2.2f, Last15Min: %2.2f", l.Last5Min, l.Last15Min), nil
 }

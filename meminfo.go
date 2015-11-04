@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/Financial-Times/go-fthealth"
+	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	linuxproc "github.com/c9s/goprocinfo/linux"
 )
 
@@ -24,17 +24,16 @@ func (mc memoryChecker) Checks() []fthealth.Check {
 	return []fthealth.Check{check}
 }
 
-func (mc memoryChecker) avMemoryCheck() error {
-
+func (mc memoryChecker) avMemoryCheck() (string, error) {
 	meminfo, err := linuxproc.ReadMemInfo(*hostPath + "/proc/meminfo")
 	if err != nil {
-		return err
+		return "", err
 	}
 	available := meminfo.MemAvailable
 	total := meminfo.MemTotal
 	availablePercent := float64(available) / float64(total) * 100
 	if availablePercent < mc.thresholdPercent {
-		return fmt.Errorf("Low available memory: %2.1f %%", availablePercent)
+		return fmt.Sprintf("%2.1f%%", availablePercent), fmt.Errorf("Low available memory: %2.1f%%", availablePercent)
 	}
-	return nil
+	return fmt.Sprintf("%2.1f%%", availablePercent), nil
 }

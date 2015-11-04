@@ -2,16 +2,18 @@ package main
 
 import (
 	"fmt"
-	"github.com/Financial-Times/go-fthealth"
+	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	linuxproc "github.com/c9s/goprocinfo/linux"
 	"time"
 )
 
 type interruptsChecker struct {
-	threshold uint64
+	threshold       uint64
+	latestIntPerSec chan uint64
 }
 
 func (ic interruptsChecker) Checks() []fthealth.Check {
+	ic.latestIntPerSec = make(chan uint64)
 
 	go ic.updateIntCount()
 
@@ -35,16 +37,14 @@ func (ic interruptsChecker) count() uint64 {
 	return d.Interrupts
 }
 
-func (ic interruptsChecker) intCheck() error {
-	perSec := <-latestIntPerSec
+func (ic interruptsChecker) intCheck() (string, error) {
+	perSec := <-ic.latestIntPerSec
 	threshold := uint64(ic.threshold)
 	if perSec > threshold {
-		return fmt.Errorf("%d interrupts per second. (>%d)", perSec, threshold)
+		return fmt.Sprintf("%d", perSec), fmt.Errorf("%d interrupts per second. (>%d)", perSec, threshold)
 	}
-	return nil
+	return fmt.Sprintf("%d", perSec), nil
 }
-
-var latestIntPerSec chan uint64 = make(chan uint64)
 
 func (ic interruptsChecker) updateIntCount() {
 	ticker := time.NewTicker(1 * time.Second)
@@ -52,7 +52,7 @@ func (ic interruptsChecker) updateIntCount() {
 	prevInt := uint64(0)
 	for {
 		select {
-		case latestIntPerSec <- latestPerSec:
+		case ic.latestIntPerSec <- latestPerSec:
 		case <-ticker.C:
 			newInt := ic.count()
 			if prevInt != 0 {

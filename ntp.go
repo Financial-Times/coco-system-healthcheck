@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/Financial-Times/go-fthealth"
+	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -13,7 +13,7 @@ import (
 type ntpChecker struct{}
 
 type offsetResult struct {
-	val float64
+	val string
 	err error
 }
 
@@ -34,15 +34,21 @@ func (ntpc ntpChecker) Checks() []fthealth.Check {
 	return []fthealth.Check{ntpCheck}
 }
 
-func (ntpc ntpChecker) Check() error {
+func (ntpc ntpChecker) Check() (string, error) {
 	offset := <-offsetCh
 	if offset.err != nil {
-		return offset.err
+		return offset.val, offset.err
 	}
-	if offset.val > 100 || offset.val < -100 {
-		return fmt.Errorf("offset is greater then limit of 100: %f", offset.val)
+
+	offsetFloat, err := strconv.ParseFloat(offset.val, 64)
+	if err != nil {
+		return offset.val, fmt.Errorf("Could not parse offset: %v", err)
 	}
-	return nil
+
+	if offsetFloat > 100 || offsetFloat < -100 {
+		return offset.val, fmt.Errorf("offset is greater then limit of 100: %f", offsetFloat)
+	}
+	return offset.val, nil
 }
 
 func ntpLoop() {
@@ -80,12 +86,8 @@ func ntpOffset(ntpCmd func() string) offsetResult {
 		}
 	}
 	if offset == "" {
-		return offsetResult{0, fmt.Errorf("ntpd did not return an offset value")}
-	}
-	offsetFloat, err := strconv.ParseFloat(offset, 64)
-	if err != nil {
-		return offsetResult{0, fmt.Errorf("Could not parse offset: %v", err)}
+		return offsetResult{"", fmt.Errorf("ntpd did not return an offset value")}
 	}
 
-	return offsetResult{offsetFloat, nil}
+	return offsetResult{offset, nil}
 }
