@@ -40,9 +40,9 @@ func (dff diskFreeChecker) diskSpaceCheck(path string) (string, error) {
 	}
 	pctAvail := (float64(d.Free) / float64(d.All) * 100)
 	if pctAvail < dff.thresholdPercent {
-		return fmt.Sprintf("%2.1f %%", pctAvail), fmt.Errorf("Low free space on %s. Free disk space: %2.1f %%", path, pctAvail)
+		return fmt.Sprintf("%2.1f%%", pctAvail), fmt.Errorf("Low free space on %s. Free disk space: %2.1f%%", path, pctAvail)
 	}
-	return fmt.Sprintf("%2.1f %%", pctAvail), nil
+	return fmt.Sprintf("%2.1f%%", pctAvail), nil
 }
 
 func (dff diskFreeChecker) rootDiskSpaceCheck() (string, error) {

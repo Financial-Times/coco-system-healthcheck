@@ -33,7 +33,7 @@ func (mc memoryChecker) avMemoryCheck() (string, error) {
 	total := meminfo.MemTotal
 	availablePercent := float64(available) / float64(total) * 100
 	if availablePercent < mc.thresholdPercent {
-		return fmt.Sprintf("%2.1f %%", availablePercent), fmt.Errorf("Low available memory: %2.1f %%", availablePercent)
+		return fmt.Sprintf("%2.1f%%", availablePercent), fmt.Errorf("Low available memory: %2.1f%%", availablePercent)
 	}
-	return fmt.Sprintf("%2.1f %%", availablePercent), nil
+	return fmt.Sprintf("%2.1f%%", availablePercent), nil
 }
