@@ -24,7 +24,7 @@ func (vethc vethChecker) Checks() []fthealth.Check {
 	vethCh = make(chan vethResult)
 	go vethCollector()
 
-	ntpCheck := fthealth.Check{
+	vethCheck := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be affected",
 		Name:             "veth interface check",
 		PanicGuide:       "Please refer to technical summary",
@@ -32,7 +32,7 @@ func (vethc vethChecker) Checks() []fthealth.Check {
 		TechnicalSummary: "Box is likely experiencing docker veth bug, please restart: `sudo locksmithctl restart`",
 		Checker:          vethc.Check,
 	}
-	return []fthealth.Check{ntpCheck}
+	return []fthealth.Check{vethCheck}
 }
 
 func (vethc vethChecker) Check() (string, error) {
