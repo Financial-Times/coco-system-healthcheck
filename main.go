@@ -24,6 +24,7 @@ func main() {
 	//checks = append(checks, interruptsChecker{threshold: 10000}.Checks()...)
 	//checks = append(checks, iopsChecker{1000}.Checks()...)
 	checks = append(checks, ntpChecker{}.Checks()...)
+	checks = append(checks, tcpChecker{}.Checks()...)
 
 	mux := mux.NewRouter()
 	mux.HandleFunc("/__health", fthealth.Handler("myserver", "a server", checks...))
