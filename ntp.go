@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	fthealth "github.com/Financial-Times/go-fthealth/v1a"
+	"log"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -86,6 +87,7 @@ func ntpOffset(ntpCmd func() string) offsetResult {
 		}
 	}
 	if offset == "" {
+		log.Printf("Didn't get an offset, ntpd out: %v", out)
 		return offsetResult{"", fmt.Errorf("ntpd did not return an offset value")}
 	}
 
