@@ -79,17 +79,22 @@ func ntpCmd() string {
 
 func ntpOffset(ntpCmd func() string) offsetResult {
 	var offset string
-	out := strings.Split(ntpCmd(), " ")
-	for _, str := range out {
-		if strings.Index(str, "offset") != -1 {
-			offset = strings.Split(str, ":")[1]
-			break
+	var out []string
+	maxAttempts := 5
+
+	for attempts := 0; attempts < maxAttempts; attempts++ {
+		out = strings.Split(ntpCmd(), " ")
+		for _, str := range out {
+			if strings.Index(str, "offset") != -1 {
+				offset = strings.Split(str, ":")[1]
+				return offsetResult{offset, nil}
+			}
+		}
+		if offset == "" {
+			log.Printf("Didn't get an output from ntpd command, attempt #%v", attempts)
+			time.Sleep(time.Duration(10) * time.Second)
 		}
 	}
-	if offset == "" {
-		log.Printf("Didn't get an offset, ntpd out: %v", out)
-		return offsetResult{"", fmt.Errorf("ntpd did not return an offset value")}
-	}
-
-	return offsetResult{offset, nil}
+	log.Printf("Didn't get an offset, ntpd out: %v", out)
+	return offsetResult{"", fmt.Errorf("ntpd did not return an offset value")}
 }
