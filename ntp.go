@@ -82,7 +82,7 @@ func ntpOffset(ntpCmd func() string) offsetResult {
 	var out []string
 	maxAttempts := 5
 
-	for attempts := 1; attempts < maxAttempts; attempts++ {
+	for attempts := 0; attempts < maxAttempts; attempts++ {
 		out = strings.Split(ntpCmd(), " ")
 		for _, str := range out {
 			if strings.Index(str, "offset") != -1 {
