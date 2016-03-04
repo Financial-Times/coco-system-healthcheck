@@ -38,7 +38,7 @@ func (ntpc ntpChecker) Check() (string, error) {
 		return offset.val.String(), offset.err
 	}
 
-	if offset.val > 1*time.Minute || offset.val < -1*time.Minute {
+	if offset.val > 2*time.Second || offset.val < -2*time.Second {
 		return offset.val.String(), fmt.Errorf("offset is greater then limit of 1 minute: %s", offset.val.String())
 	}
 	return offset.val.String(), nil
