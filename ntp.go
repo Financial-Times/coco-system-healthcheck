@@ -4,17 +4,14 @@ import (
 	"errors"
 	"fmt"
 	fthealth "github.com/Financial-Times/go-fthealth/v1a"
-	"log"
-	"os/exec"
-	"strconv"
-	"strings"
+	"github.com/bt51/ntpclient"
 	"time"
 )
 
 type ntpChecker struct{}
 
 type offsetResult struct {
-	val string
+	val time.Duration
 	err error
 }
 
@@ -38,25 +35,20 @@ func (ntpc ntpChecker) Checks() []fthealth.Check {
 func (ntpc ntpChecker) Check() (string, error) {
 	offset := <-offsetCh
 	if offset.err != nil {
-		return offset.val, offset.err
+		return offset.val.String(), offset.err
 	}
 
-	offsetFloat, err := strconv.ParseFloat(offset.val, 64)
-	if err != nil {
-		return offset.val, fmt.Errorf("Could not parse offset: %v", err)
+	if offset.val > 2*time.Second || offset.val < -2*time.Second {
+		return offset.val.String(), fmt.Errorf("offset is greater then limit of 1 minute: %s", offset.val.String())
 	}
-
-	if offsetFloat > 100 || offsetFloat < -100 {
-		return offset.val, fmt.Errorf("offset is greater then limit of 100: %f", offsetFloat)
-	}
-	return offset.val, nil
+	return offset.val.String(), nil
 }
 
 func ntpLoop() {
 	update := make(chan offsetResult)
 	go func() {
 		for {
-			update <- ntpOffset(ntpCmd)
+			update <- ntpOffset()
 			time.Sleep(10 * time.Minute)
 		}
 	}()
@@ -71,30 +63,10 @@ func ntpLoop() {
 	}
 }
 
-func ntpCmd() string {
-	// Throw away the error, it never returns 0, and we can catch an actual error later
-	cmdOut, _ := exec.Command("ntpd", "-q", "-n", "-w", "-p", "pool.ntp.org").CombinedOutput()
-	return string(cmdOut)
-}
-
-func ntpOffset(ntpCmd func() string) offsetResult {
-	var offset string
-	var out []string
-	maxAttempts := 5
-
-	for attempts := 0; attempts < maxAttempts; attempts++ {
-		out = strings.Split(ntpCmd(), " ")
-		for _, str := range out {
-			if strings.Index(str, "offset") != -1 {
-				offset = strings.Split(str, ":")[1]
-				return offsetResult{offset, nil}
-			}
-		}
-		if offset == "" {
-			log.Printf("Didn't get an output from ntpd command, attempt #%v", attempts)
-			time.Sleep(time.Duration(10) * time.Second)
-		}
+func ntpOffset() offsetResult {
+	t, err := ntpclient.GetNetworkTime("0.pool.ntp.org", 123)
+	if err != nil {
+		return offsetResult{0, fmt.Errorf("Could not get time form 0.pool.ntp.org")}
 	}
-	log.Printf("Didn't get an offset, ntpd out: %v", out)
-	return offsetResult{"", fmt.Errorf("ntpd did not return an offset value")}
+	return offsetResult{time.Since(*t), nil}
 }
