@@ -8,14 +8,15 @@ import (
 	"time"
 )
 
+var offsetCh chan offsetResult
+var pools = [4]string{"0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org", "3.pool.ntp.org"}
+
 type ntpChecker struct{}
 
 type offsetResult struct {
 	val time.Duration
 	err error
 }
-
-var offsetCh chan offsetResult
 
 func (ntpc ntpChecker) Checks() []fthealth.Check {
 	offsetCh = make(chan offsetResult)
@@ -49,7 +50,7 @@ func ntpLoop() {
 	go func() {
 		for {
 			update <- ntpOffset()
-			time.Sleep(10 * time.Minute)
+			time.Sleep(1 * time.Minute)
 		}
 	}()
 
@@ -63,10 +64,21 @@ func ntpLoop() {
 	}
 }
 
+func callNtp() (*time.Time, error) {
+	var err error
+	for _, pool := range pools {
+		t, err := ntpclient.GetNetworkTime(pool, 123)
+		if err == nil {
+			return t, err
+		}
+	}
+	return nil, err
+}
+
 func ntpOffset() offsetResult {
-	t, err := ntpclient.GetNetworkTime("0.pool.ntp.org", 123)
+	t, err := callNtp()
 	if err != nil {
-		return offsetResult{0, fmt.Errorf("Could not get time form 0.pool.ntp.org")}
+		return offsetResult{0, fmt.Errorf("Could not get time form 0.pool.ntp.org %v", err)}
 	}
 	return offsetResult{time.Since(*t), nil}
 }
