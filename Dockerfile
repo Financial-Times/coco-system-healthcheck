@@ -13,5 +13,5 @@ RUN apk --update add go git \
   && rm -rf $GOPATH /var/cache/apk/*
 
 EXPOSE 8080
-CMD /coco-system-healthcheck --hostPath=$HOST_DIR
+CMD ["/coco-system-healthcheck"]
 
