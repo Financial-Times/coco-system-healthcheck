@@ -78,7 +78,7 @@ func callNtp() (*time.Time, error) {
 func ntpOffset() offsetResult {
 	t, err := callNtp()
 	if err != nil {
-		return offsetResult{0, fmt.Errorf("Could not get time form 0.pool.ntp.org %v", err)}
+		return offsetResult{0, fmt.Errorf("Could not get time %v", err)}
 	}
 	return offsetResult{time.Since(*t), nil}
 }
