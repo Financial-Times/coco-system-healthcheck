@@ -1,28 +1,31 @@
 package main
 
 import (
-	"flag"
 	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	"github.com/gorilla/mux"
+	"github.com/jawher/mow.cli"
 	"log"
 	"net/http"
 )
 
 var (
 	checks   []fthealth.Check
-	hostPath = flag.String("hostPath", "", "The dir path of the mounted host fs (in the container)")
+	hostPath *string
 )
 
 func main() {
-	flag.Parse()
+	app := cli.App("System-healthcheck", "A service that report on current VM status at __health")
+
+	hostPath = app.String(cli.StringOpt{
+		Name:   "hostPath",
+		Value:  "",
+		Desc:   "The dir path of the mounted host fs (in the container)",
+		EnvVar: "SYS_HC_HOST_PATH",
+	})
 
 	checks = append(checks, diskFreeChecker{20}.Checks()...)
 	checks = append(checks, memoryChecker{20}.Checks()...)
 	checks = append(checks, loadAverageChecker{}.Checks()...)
-	//checks = append(checks, inodeChecker{1024}.Checks()...)
-	//checks = append(checks, contextSwitchChecker{threshold: 120000}.Checks()...)
-	//checks = append(checks, interruptsChecker{threshold: 10000}.Checks()...)
-	//checks = append(checks, iopsChecker{1000}.Checks()...)
 	checks = append(checks, ntpChecker{}.Checks()...)
 	checks = append(checks, tcpChecker{}.Checks()...)
 
