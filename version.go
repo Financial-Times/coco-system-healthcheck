@@ -29,10 +29,10 @@ func (v versionChecker) Checks() []fthealth.Check {
 	go loop()
 	check := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be affected",
-		Name:             "CoreOS version Check",
+		Name:             "CoreOS version",
 		PanicGuide:       "Please refer to technical summary",
 		Severity:         2,
-		TechnicalSummary: "CoreOS version is out of data or cannot be determined",
+		TechnicalSummary: "CoreOS version is out of date or cannot be determined",
 		Checker:          v.Check,
 	}
 	return []fthealth.Check{check}
