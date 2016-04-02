@@ -28,6 +28,7 @@ func main() {
 	checks = append(checks, loadAverageChecker{}.Checks()...)
 	checks = append(checks, ntpChecker{}.Checks()...)
 	checks = append(checks, tcpChecker{}.Checks()...)
+	checks = append(checks, versionChecker{}.Checks()...)
 
 	mux := mux.NewRouter()
 	mux.HandleFunc("/__health", fthealth.Handler("myserver", "a server", checks...))
