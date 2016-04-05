@@ -12,8 +12,6 @@ import (
 
 const (
 	versionUri string = "http://%s.release.core-os.net/amd64-usr/current/version.txt"
-	channelF   string = "/etc/coreos/update.conf"
-	releaseF   string = "/usr/share/coreos/release"
 )
 
 var resultCh chan result
@@ -62,11 +60,11 @@ func loop() {
 }
 
 func latest() result {
-	channel, err := valFromFile("GROUP=", channelF)
+	channel, err := valFromFile("GROUP=", *hostPath+"/etc/coreos/update.conf")
 	if err != nil {
 		return result{err: err}
 	}
-	release, err := valFromFile("COREOS_RELEASE_VERSION=", releaseF)
+	release, err := valFromFile("COREOS_RELEASE_VERSION=", *hostPath+"/usr/share/coreos/release")
 	if err != nil {
 		return result{err: err}
 	}
