@@ -13,13 +13,13 @@ const (
 	versionUri string = "http://%s.release.core-os.net/amd64-usr/current/version.txt"
 )
 
-var resultCh chan result
+var versionCh chan result
 
 type versionChecker struct{}
 
 func (v versionChecker) Checks() []fthealth.Check {
-	resultCh = make(chan result)
-	go loop(latest, 300, resultCh)
+	versionCh = make(chan result)
+	go loop(latest, 300, versionCh)
 	check := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be affected",
 		Name:             "CoreOS version",
@@ -32,7 +32,7 @@ func (v versionChecker) Checks() []fthealth.Check {
 }
 
 func (v versionChecker) Check() (string, error) {
-	result := <-resultCh
+	result := <-versionCh
 	return result.val, result.err
 }
 
