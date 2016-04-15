@@ -1,26 +1,20 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	"github.com/bt51/ntpclient"
 	"time"
 )
 
-var offsetCh chan offsetResult
+var offsetCh chan result
 var pools = [4]string{"0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org", "3.pool.ntp.org"}
 
 type ntpChecker struct{}
 
-type offsetResult struct {
-	val time.Duration
-	err error
-}
-
 func (ntpc ntpChecker) Checks() []fthealth.Check {
-	offsetCh = make(chan offsetResult)
-	go ntpLoop()
+	offsetCh = make(chan result)
+	go loop(ntpOffset, 60, offsetCh)
 
 	ntpCheck := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be affected",
@@ -35,33 +29,7 @@ func (ntpc ntpChecker) Checks() []fthealth.Check {
 
 func (ntpc ntpChecker) Check() (string, error) {
 	offset := <-offsetCh
-	if offset.err != nil {
-		return offset.val.String(), offset.err
-	}
-
-	if offset.val > 2*time.Second || offset.val < -2*time.Second {
-		return offset.val.String(), fmt.Errorf("offset is greater then limit of 2 seconds: %s", offset.val.String())
-	}
-	return offset.val.String(), nil
-}
-
-func ntpLoop() {
-	update := make(chan offsetResult)
-	go func() {
-		for {
-			update <- ntpOffset()
-			time.Sleep(1 * time.Minute)
-		}
-	}()
-
-	offset := offsetResult{err: errors.New("Ntp offset not initialised")}
-	for {
-		select {
-		case offsetCh <- offset:
-		case o := <-update:
-			offset = o
-		}
-	}
+	return offset.val, offset.err
 }
 
 func callNtp() (*time.Time, error) {
@@ -75,10 +43,15 @@ func callNtp() (*time.Time, error) {
 	return nil, err
 }
 
-func ntpOffset() offsetResult {
+func ntpOffset() result {
 	t, err := callNtp()
 	if err != nil {
-		return offsetResult{0, fmt.Errorf("Could not get time %v", err)}
+		return result{err: fmt.Errorf("Could not get time %v", err)}
 	}
-	return offsetResult{time.Since(*t), nil}
+	tsn := time.Since(*t)
+	if tsn > 2*time.Second || tsn < -2*time.Second {
+		return result{err: fmt.Errorf("offset is greater then limit of 2 seconds: %s", tsn)}
+	}
+
+	return result{val: tsn.String()}
 }

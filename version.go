@@ -7,24 +7,19 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
-	"time"
 )
 
 const (
 	versionUri string = "http://%s.release.core-os.net/amd64-usr/current/version.txt"
 )
 
-var resultCh chan result
+var versionCh chan result
 
 type versionChecker struct{}
-type result struct {
-	val string
-	err error
-}
 
 func (v versionChecker) Checks() []fthealth.Check {
-	resultCh = make(chan result)
-	go loop()
+	versionCh = make(chan result)
+	go loop(latest, 300, versionCh)
 	check := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be affected",
 		Name:             "CoreOS version",
@@ -37,26 +32,8 @@ func (v versionChecker) Checks() []fthealth.Check {
 }
 
 func (v versionChecker) Check() (string, error) {
-	result := <-resultCh
+	result := <-versionCh
 	return result.val, result.err
-}
-
-func loop() {
-	updateCh := make(chan result)
-	go func() {
-		for {
-			updateCh <- latest()
-			time.Sleep(5 * time.Minute)
-		}
-	}()
-
-	result := result{err: errors.New("No version yet")}
-	for {
-		select {
-		case resultCh <- result:
-		case result = <-updateCh:
-		}
-	}
 }
 
 func latest() result {
@@ -75,7 +52,7 @@ func latest() result {
 	if release != rmtRel {
 		return result{
 			val: fmt.Sprintf("Local release %v different from remote %v", release, rmtRel),
-			err: errors.New(fmt.Sprintf("Local release %v different from remote %v", release, rmtRel)),
+			err: fmt.Errorf("Local release %v different from remote %v", release, rmtRel),
 		}
 	}
 	return result{val: fmt.Sprintf("Current release %v is latest on %v", release, channel)}
@@ -93,7 +70,7 @@ func valFromFile(key, path string) (val string, err error) {
 			return v, nil
 		}
 	}
-	return "", errors.New(fmt.Sprintf("No %s in %s", val, path))
+	return "", fmt.Errorf("No %s in %s", val, path)
 }
 
 func rmtRel(channel string) (release string, err error) {
@@ -103,7 +80,7 @@ func rmtRel(channel string) (release string, err error) {
 		return "", err
 	}
 	if resp.StatusCode != 200 {
-		return "", errors.New(fmt.Sprintf("Got %v requesting %v", resp.StatusCode, uri))
+		return "", fmt.Errorf("Got %v requesting %v", resp.StatusCode, uri)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	lines := strings.Split(string(body), "\n")
