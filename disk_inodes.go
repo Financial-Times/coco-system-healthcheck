@@ -20,7 +20,7 @@ func (ic inodeChecker) Checks() []fthealth.Check {
 		Name:             "Root disk inode check",
 		PanicGuide:       panicGuide,
 		Severity:         2,
-		TechnicalSummary: "Please free some inodes on the 'root' mount",
+		TechnicalSummary: "Please free some inodes on the 'root' mount hint: df -i",
 		Checker:          ic.rootInodesCheck,
 	}
 
@@ -29,7 +29,7 @@ func (ic inodeChecker) Checks() []fthealth.Check {
 		Name:             "Persistent disk inode check on '/vol' (always true for stateless nodes)",
 		PanicGuide:       panicGuide,
 		Severity:         2,
-		TechnicalSummary: "Please clear some inodes on the 'vol' mount",
+		TechnicalSummary: "Please clear some inodes on the 'vol' mount hint: df -i",
 		Checker:          ic.mountedInodesCheck,
 	}
 
