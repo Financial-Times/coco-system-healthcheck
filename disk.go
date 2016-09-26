@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	linuxproc "github.com/c9s/goprocinfo/linux"
-	"os"
 )
 
 type diskFreeChecker struct {
@@ -15,7 +16,7 @@ func (dff diskFreeChecker) Checks() []fthealth.Check {
 	rootCheck := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be affected",
 		Name:             "Root disk space check",
-		PanicGuide:       "Please refer to technical summary",
+		PanicGuide:       "Please refer to the technical summary section below",
 		Severity:         2,
 		TechnicalSummary: "Please clear some disk space on the 'root' mount",
 		Checker:          dff.rootDiskSpaceCheck,
@@ -24,7 +25,7 @@ func (dff diskFreeChecker) Checks() []fthealth.Check {
 	mountedCheck := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be effected",
 		Name:             "Persistent disk space check mounted on '/vol' (always true for stateless nodes)",
-		PanicGuide:       "Please refer to technical summary",
+		PanicGuide:       "Please refer to the technical summary section below",
 		Severity:         2,
 		TechnicalSummary: "Please clear some disk space on the 'vol' mount",
 		Checker:          dff.mountedDiskSpaceCheck,

@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	fthealth "github.com/Financial-Times/go-fthealth/v1a"
-	linuxproc "github.com/c9s/goprocinfo/linux"
 	"log"
 	"time"
+
+	fthealth "github.com/Financial-Times/go-fthealth/v1a"
+	linuxproc "github.com/c9s/goprocinfo/linux"
 )
 
 type iopsChecker struct {
@@ -49,7 +50,7 @@ func (ic iopsChecker) iopsCheck() (string, error) {
 	return fmt.Sprintf("%d", perSec), nil
 }
 
-var latestPerSec chan uint64 = make(chan uint64)
+var latestPerSec = make(chan uint64)
 
 func (ic iopsChecker) updateIopsCount() {
 	ticker := time.NewTicker(1 * time.Second)

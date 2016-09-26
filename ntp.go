@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"time"
+
 	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	"github.com/bt51/ntpclient"
-	"time"
 )
 
 var offsetCh chan result
@@ -19,7 +20,7 @@ func (ntpc ntpChecker) Checks() []fthealth.Check {
 	ntpCheck := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be affected",
 		Name:             "NTP sync check",
-		PanicGuide:       "Please refer to technical summary",
+		PanicGuide:       "Please refer to the technical summary section below",
 		Severity:         2,
 		TechnicalSummary: "System time has drifted out of sync of the box, investigate `timedatectl` and `systemd-timesyncd.service`",
 		Checker:          ntpc.Check,
