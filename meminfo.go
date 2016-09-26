@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	linuxproc "github.com/c9s/goprocinfo/linux"
 )
@@ -15,9 +16,9 @@ func (mc memoryChecker) Checks() []fthealth.Check {
 	check := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be affected",
 		Name:             "Memory load check",
-		PanicGuide:       "Please refer to technical summary",
+		PanicGuide:       "Please refer to the technical summary section below",
 		Severity:         2,
-		TechnicalSummary: "Check the memory usage of services/containers on this host, please proceed conform these values.",
+		TechnicalSummary: "Check the memory usage of services/containers on this host, please confirm these values.",
 		Checker:          mc.avMemoryCheck,
 	}
 
