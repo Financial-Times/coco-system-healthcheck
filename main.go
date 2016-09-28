@@ -24,7 +24,7 @@ func main() {
 	})
 
 	checks = append(checks, diskFreeChecker{20}.Checks()...)
-	checks = append(checks, memoryChecker{20}.Checks()...)
+	checks = append(checks, memoryChecker{15}.Checks()...)
 	checks = append(checks, loadAverageChecker{}.Checks()...)
 	checks = append(checks, ntpChecker{}.Checks()...)
 	checks = append(checks, tcpChecker{}.Checks()...)
