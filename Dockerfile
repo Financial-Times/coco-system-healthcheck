@@ -1,4 +1,4 @@
-FROM alpine 3.4
+FROM alpine:3.4
 ADD . /
 RUN apk --update add go git \
   && ORG_PATH="github.com/Financial-Times" \
