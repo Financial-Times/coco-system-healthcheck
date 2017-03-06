@@ -11,9 +11,14 @@ import (
 var offsetCh chan result
 var pools = [4]string{"0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org", "3.pool.ntp.org"}
 
-type ntpChecker struct{}
+type ntpChecker interface {
+	Checks() []fthealth.Check
+	Check() (string, error)
+}
 
-func (ntpc ntpChecker) Checks() []fthealth.Check {
+type ntpCheckerImpl struct{}
+
+func (ntpc ntpCheckerImpl) Checks() []fthealth.Check {
 	offsetCh = make(chan result)
 	go loop(ntpOffset, 60, offsetCh)
 
@@ -28,7 +33,7 @@ func (ntpc ntpChecker) Checks() []fthealth.Check {
 	return []fthealth.Check{ntpCheck}
 }
 
-func (ntpc ntpChecker) Check() (string, error) {
+func (ntpc ntpCheckerImpl) Check() (string, error) {
 	offset := <-offsetCh
 	return offset.val, offset.err
 }

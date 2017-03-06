@@ -1,11 +1,12 @@
 package main
 
 import (
+	"log"
+	"net/http"
+
 	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	"github.com/gorilla/mux"
 	"github.com/jawher/mow.cli"
-	"log"
-	"net/http"
 )
 
 var (
@@ -23,17 +24,20 @@ func main() {
 		EnvVar: "SYS_HC_HOST_PATH",
 	})
 
-	checks = append(checks, diskFreeChecker{20}.Checks()...)
-	checks = append(checks, memoryChecker{15}.Checks()...)
-	checks = append(checks, loadAverageChecker{}.Checks()...)
-	checks = append(checks, ntpChecker{}.Checks()...)
-	checks = append(checks, tcpChecker{}.Checks()...)
+	checks = append(checks, diskFreeCheckerImpl{20}.Checks()...)
+	checks = append(checks, memoryCheckerImpl{15}.Checks()...)
+	checks = append(checks, loadAverageCheckerImpl{}.Checks()...)
+	checks = append(checks, ntpCheckerImpl{}.Checks()...)
+	checks = append(checks, tcpCheckerImpl{}.Checks()...)
 
-	mux := mux.NewRouter()
-	mux.HandleFunc("/__health", fthealth.Handler("myserver", "a server", checks...))
+	router := mux.NewRouter()
+	router.HandleFunc("/__health", fthealth.Handler("myserver", "a server", checks...))
 
-	log.Printf("Starting http server on 8080\n")
-	err := http.ListenAndServe(":8080", mux)
+	gtg := newGtgService(20, 15)
+	router.HandleFunc("/__gtg", gtg.Check)
+
+	log.Print("Starting http server on 8080\n")
+	err := http.ListenAndServe(":8080", router)
 	if err != nil {
 		panic(err)
 	}

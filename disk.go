@@ -8,18 +8,24 @@ import (
 	linuxproc "github.com/c9s/goprocinfo/linux"
 )
 
-type diskFreeChecker struct {
+type diskFreeChecker interface {
+	Checks() []fthealth.Check
+	RootDiskSpaceCheck() (string, error)
+	MountedDiskSpaceCheck() (string, error)
+}
+
+type diskFreeCheckerImpl struct {
 	thresholdPercent float64
 }
 
-func (dff diskFreeChecker) Checks() []fthealth.Check {
+func (dff diskFreeCheckerImpl) Checks() []fthealth.Check {
 	rootCheck := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be affected",
 		Name:             "Root disk space check",
 		PanicGuide:       "Please refer to the technical summary section below",
 		Severity:         2,
 		TechnicalSummary: "Please clear some disk space on the 'root' mount",
-		Checker:          dff.rootDiskSpaceCheck,
+		Checker:          dff.RootDiskSpaceCheck,
 	}
 
 	mountedCheck := fthealth.Check{
@@ -28,13 +34,13 @@ func (dff diskFreeChecker) Checks() []fthealth.Check {
 		PanicGuide:       "Please refer to the technical summary section below",
 		Severity:         2,
 		TechnicalSummary: "Please clear some disk space on the 'vol' mount",
-		Checker:          dff.mountedDiskSpaceCheck,
+		Checker:          dff.MountedDiskSpaceCheck,
 	}
 
 	return []fthealth.Check{rootCheck, mountedCheck}
 }
 
-func (dff diskFreeChecker) diskSpaceCheck(path string) (string, error) {
+func (dff diskFreeCheckerImpl) diskSpaceCheck(path string) (string, error) {
 	d, err := linuxproc.ReadDisk(path)
 	if err != nil {
 		return "", fmt.Errorf("Cannot read disk info of %s file system.", path)
@@ -46,11 +52,11 @@ func (dff diskFreeChecker) diskSpaceCheck(path string) (string, error) {
 	return fmt.Sprintf("%2.1f%%", pctAvail), nil
 }
 
-func (dff diskFreeChecker) rootDiskSpaceCheck() (string, error) {
+func (dff diskFreeCheckerImpl) RootDiskSpaceCheck() (string, error) {
 	return dff.diskSpaceCheck(*hostPath + "/")
 }
 
-func (dff diskFreeChecker) mountedDiskSpaceCheck() (string, error) {
+func (dff diskFreeCheckerImpl) MountedDiskSpaceCheck() (string, error) {
 	path := *hostPath + "/vol"
 	if _, err := os.Stat(path); err != nil && os.IsNotExist(err) {
 		return "", nil
