@@ -94,7 +94,7 @@ func TestCheckInsufficientMountedDiskSpace(t *testing.T) {
 	assert.Equal(t, 503, respWriter.Result().StatusCode)
 }
 
-func TestCheckHighAverageLoad(t *testing.T) {
+func TestCheckHighAverageCPULoad(t *testing.T) {
 	mockedDfc := &mockedDiskFreeChecker{}
 	mockedLac := &mockedLoadAverageChecker{}
 	mockedMc := &mockedMemoryChecker{}
@@ -122,7 +122,7 @@ func TestCheckHighAverageLoad(t *testing.T) {
 	assert.Equal(t, 503, respWriter.Result().StatusCode)
 }
 
-func TestCheckAverageMemoryLoad(t *testing.T) {
+func TestCheckHighAverageMemoryLoad(t *testing.T) {
 	mockedDfc := &mockedDiskFreeChecker{}
 	mockedLac := &mockedLoadAverageChecker{}
 	mockedMc := &mockedMemoryChecker{}
