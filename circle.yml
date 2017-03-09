@@ -1,9 +1,7 @@
-dependencies:
-  pre:
-    - go get -u github.com/jstemmer/go-junit-report
 test:
   pre:
-    - go get github.com/mattn/goveralls
+    - go get -u github.com/jstemmer/go-junit-report
+    - go get -u github.com/mattn/goveralls
   override:
     - mkdir -p $CIRCLE_TEST_REPORTS/golang
     - go test -race -v ./... | go-junit-report > $CIRCLE_TEST_REPORTS/golang/junit.xml
