@@ -36,7 +36,7 @@ func main() {
 	router.HandleFunc("/__health", fthealth.Handler("myserver", "a server", checks...))
 
 	gtgService := newGtgService(20, 15)
-	gtgHandler := httphandlers.NewGoodToGoHandler(gtg.StatusChecker(gtgService.Check))
+	gtgHandler := httphandlers.NewGoodToGoHandler(gtgService.Check)
 	router.HandleFunc(httphandlers.GTGPath, gtgHandler)
 
 	log.Print("Starting http server on 8080\n")
