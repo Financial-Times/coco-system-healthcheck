@@ -6,7 +6,6 @@ import (
 
 	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	"github.com/Financial-Times/service-status-go/httphandlers"
-	"github.com/Financial-Times/service-status-go/gtg"
 	"github.com/gorilla/mux"
 	"github.com/jawher/mow.cli"
 )
