@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	fthealth "github.com/Financial-Times/go-fthealth/v1a"
+	"github.com/Financial-Times/service-status-go/httphandlers"
+	"github.com/Financial-Times/service-status-go/gtg"
 	"github.com/gorilla/mux"
 	"github.com/jawher/mow.cli"
 )
@@ -33,8 +35,9 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/__health", fthealth.Handler("myserver", "a server", checks...))
 
-	gtg := newGtgService(20, 15)
-	router.HandleFunc("/__gtg", gtg.Check)
+	gtgService := newGtgService(20, 15)
+	gtgHandler := httphandlers.NewGoodToGoHandler(gtg.StatusChecker(gtgService.Check))
+	router.HandleFunc(httphandlers.GTGPath, gtgHandler)
 
 	log.Print("Starting http server on 8080\n")
 	err := http.ListenAndServe(":8080", router)

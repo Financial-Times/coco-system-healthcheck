@@ -7,7 +7,6 @@ import (
 	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"net/http/httptest"
 )
 
 func TestCheckHappyFlow(t *testing.T) {
@@ -32,10 +31,9 @@ func TestCheckHappyFlow(t *testing.T) {
 	mockedNtpc.On("Check").Return("", nil)
 	mockedTcpc.On("Check").Return("", nil)
 
-	respWriter := httptest.NewRecorder()
-	gtg.Check(respWriter, nil)
+	status := gtg.Check()
 
-	assert.Equal(t, 200, respWriter.Result().StatusCode)
+	assert.Equal(t, true, status.GoodToGo)
 }
 
 func TestCheckInsufficientRootDiskSpace(t *testing.T) {
@@ -60,10 +58,9 @@ func TestCheckInsufficientRootDiskSpace(t *testing.T) {
 	mockedNtpc.On("Check").Return("", nil)
 	mockedTcpc.On("Check").Return("", nil)
 
-	respWriter := httptest.NewRecorder()
-	gtg.Check(respWriter, nil)
+	status := gtg.Check()
 
-	assert.Equal(t, 503, respWriter.Result().StatusCode)
+	assert.Equal(t, false, status.GoodToGo)
 }
 
 func TestCheckInsufficientMountedDiskSpace(t *testing.T) {
@@ -88,10 +85,9 @@ func TestCheckInsufficientMountedDiskSpace(t *testing.T) {
 	mockedNtpc.On("Check").Return("", nil)
 	mockedTcpc.On("Check").Return("", nil)
 
-	respWriter := httptest.NewRecorder()
-	gtg.Check(respWriter, nil)
+	status := gtg.Check()
 
-	assert.Equal(t, 503, respWriter.Result().StatusCode)
+	assert.Equal(t, false, status.GoodToGo)
 }
 
 func TestCheckHighAverageCPULoad(t *testing.T) {
@@ -116,10 +112,9 @@ func TestCheckHighAverageCPULoad(t *testing.T) {
 	mockedNtpc.On("Check").Return("", nil)
 	mockedTcpc.On("Check").Return("", nil)
 
-	respWriter := httptest.NewRecorder()
-	gtg.Check(respWriter, nil)
+	status := gtg.Check()
 
-	assert.Equal(t, 503, respWriter.Result().StatusCode)
+	assert.Equal(t, false, status.GoodToGo)
 }
 
 func TestCheckHighAverageMemoryLoad(t *testing.T) {
@@ -144,10 +139,9 @@ func TestCheckHighAverageMemoryLoad(t *testing.T) {
 	mockedNtpc.On("Check").Return("", nil)
 	mockedTcpc.On("Check").Return("", nil)
 
-	respWriter := httptest.NewRecorder()
-	gtg.Check(respWriter, nil)
+	status := gtg.Check()
 
-	assert.Equal(t, 503, respWriter.Result().StatusCode)
+	assert.Equal(t, false, status.GoodToGo)
 }
 
 func TestCheckNtpOutOfSync(t *testing.T) {
@@ -172,10 +166,9 @@ func TestCheckNtpOutOfSync(t *testing.T) {
 	mockedNtpc.On("Check").Return("", errors.New("The ntp is out of sync"))
 	mockedTcpc.On("Check").Return("", nil)
 
-	respWriter := httptest.NewRecorder()
-	gtg.Check(respWriter, nil)
+	status := gtg.Check()
 
-	assert.Equal(t, 503, respWriter.Result().StatusCode)
+	assert.Equal(t, false, status.GoodToGo)
 }
 
 func TestCheckUnsuccessfulTcpConnection(t *testing.T) {
@@ -200,10 +193,9 @@ func TestCheckUnsuccessfulTcpConnection(t *testing.T) {
 	mockedNtpc.On("Check").Return("", nil)
 	mockedTcpc.On("Check").Return("", errors.New("Unsuccessful connection to TCP port"))
 
-	respWriter := httptest.NewRecorder()
-	gtg.Check(respWriter, nil)
+	status := gtg.Check()
 
-	assert.Equal(t, 503, respWriter.Result().StatusCode)
+	assert.Equal(t, false, status.GoodToGo)
 }
 
 type mockedDiskFreeChecker struct {
