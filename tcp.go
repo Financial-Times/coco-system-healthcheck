@@ -18,7 +18,7 @@ func (tcpc tcpCheckerImpl) Checks() []fthealth.Check {
 	check := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be affected",
 		Name:             "TCP connection to port 8080 is available",
-		PanicGuide:       "Please refer to the technical summary section below",
+		PanicGuide:       "https://dewey.ft.com/upp-system-healthcheck.html",
 		Severity:         2,
 		TechnicalSummary: "HTTP connections to port 8080 will not be successful to any of the services deployed on this machine if this falls.",
 		Checker:          tcpc.Check,

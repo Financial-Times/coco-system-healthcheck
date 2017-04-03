@@ -22,7 +22,7 @@ func (dff diskFreeCheckerImpl) Checks() []fthealth.Check {
 	rootCheck := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be affected",
 		Name:             "Root disk space check",
-		PanicGuide:       "Please refer to the technical summary section below",
+		PanicGuide:       "https://dewey.ft.com/upp-system-healthcheck.html",
 		Severity:         2,
 		TechnicalSummary: "Please clear some disk space on the 'root' mount",
 		Checker:          dff.RootDiskSpaceCheck,
@@ -31,7 +31,7 @@ func (dff diskFreeCheckerImpl) Checks() []fthealth.Check {
 	mountedCheck := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be effected",
 		Name:             "Persistent disk space check mounted on '/vol' (always true for stateless nodes)",
-		PanicGuide:       "Please refer to the technical summary section below",
+		PanicGuide:       "https://dewey.ft.com/upp-system-healthcheck.html",
 		Severity:         2,
 		TechnicalSummary: "Please clear some disk space on the 'vol' mount",
 		Checker:          dff.MountedDiskSpaceCheck,

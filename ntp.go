@@ -25,7 +25,7 @@ func (ntpc ntpCheckerImpl) Checks() []fthealth.Check {
 	ntpCheck := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be affected",
 		Name:             "NTP sync check",
-		PanicGuide:       "Please refer to the technical summary section below",
+		PanicGuide:       "https://dewey.ft.com/upp-system-healthcheck.html",
 		Severity:         2,
 		TechnicalSummary: "System time has drifted out of sync of the box, investigate `timedatectl` and `systemd-timesyncd.service`",
 		Checker:          ntpc.Check,

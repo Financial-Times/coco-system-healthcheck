@@ -21,7 +21,7 @@ func (mc memoryCheckerImpl) Checks() []fthealth.Check {
 	check := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be affected",
 		Name:             "Memory load check",
-		PanicGuide:       "Please refer to the technical summary section below",
+		PanicGuide:       "https://dewey.ft.com/upp-system-healthcheck.html",
 		Severity:         2,
 		TechnicalSummary: "Check the memory usage of services/containers on this host, please confirm these values.",
 		Checker:          mc.AvMemoryCheck,

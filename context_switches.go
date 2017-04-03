@@ -20,7 +20,7 @@ func (csc contextSwitchChecker) Checks() []fthealth.Check {
 	check := fthealth.Check{
 		BusinessImpact:   "System may become unresponsive",
 		Name:             "Context switches check",
-		PanicGuide:       "Check the system with vmstat and investigate cause",
+		PanicGuide:       "https://dewey.ft.com/upp-system-healthcheck.html",
 		Severity:         2,
 		TechnicalSummary: "Number of context switches as reported by /proc/stat is unusually high",
 		Checker:          csc.ctxCheck,

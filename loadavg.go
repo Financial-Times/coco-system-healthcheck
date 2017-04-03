@@ -19,7 +19,7 @@ func (lac loadAverageCheckerImpl) Checks() []fthealth.Check {
 	check := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be affected",
 		Name:             "CPU load average check",
-		PanicGuide:       "Please refer to the technical summary section below",
+		PanicGuide:       "https://dewey.ft.com/upp-system-healthcheck.html",
 		Severity:         2,
 		TechnicalSummary: "CPU is quite busy lately. This might not be a problem if it happens intermittently, however if it persists consider upgrading or adding new boxes.",
 		Checker:          lac.Check,
