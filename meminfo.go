@@ -7,25 +7,30 @@ import (
 	linuxproc "github.com/c9s/goprocinfo/linux"
 )
 
-type memoryChecker struct {
+type memoryChecker interface {
+	Checks() []fthealth.Check
+	AvMemoryCheck() (string, error)
+}
+
+type memoryCheckerImpl struct {
 	thresholdPercent float64
 }
 
-func (mc memoryChecker) Checks() []fthealth.Check {
+func (mc memoryCheckerImpl) Checks() []fthealth.Check {
 
 	check := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be affected",
 		Name:             "Memory load check",
-		PanicGuide:       "Please refer to the technical summary section below",
+		PanicGuide:       "https://dewey.ft.com/upp-system-healthcheck.html",
 		Severity:         2,
 		TechnicalSummary: "Check the memory usage of services/containers on this host, please confirm these values.",
-		Checker:          mc.avMemoryCheck,
+		Checker:          mc.AvMemoryCheck,
 	}
 
 	return []fthealth.Check{check}
 }
 
-func (mc memoryChecker) avMemoryCheck() (string, error) {
+func (mc memoryCheckerImpl) AvMemoryCheck() (string, error) {
 	meminfo, err := linuxproc.ReadMemInfo(*hostPath + "/proc/meminfo")
 	if err != nil {
 		return "", err
