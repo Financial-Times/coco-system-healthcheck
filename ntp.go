@@ -6,10 +6,11 @@ import (
 
 	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	"github.com/bt51/ntpclient"
+	"github.com/kr/pretty"
 )
 
 var offsetCh chan result
-var pools = [4]string{"0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org", "3.pool.ntp.org"}
+var pools = []string{"0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org", "3.pool.ntp.org"}
 
 type ntpChecker interface {
 	Checks() []fthealth.Check
@@ -39,20 +40,25 @@ func (ntpc ntpCheckerImpl) Check() (string, error) {
 }
 
 func callNtp() (*time.Time, error) {
-	var err error
+	return callNtpWithPools(pools)
+}
+
+func callNtpWithPools(pools []string) (*time.Time, error) {
+	var errors []result
 	for _, pool := range pools {
 		t, err := ntpclient.GetNetworkTime(pool, 123)
 		if err == nil {
 			return t, err
 		}
+		errors = append(errors, result{val: pool, err: err})
 	}
-	return nil, err
+	return nil, fmt.Errorf("None of the pools are reachable: %# v", pretty.Formatter(errors))
 }
 
 func ntpOffset() result {
 	t, err := callNtp()
 	if err != nil {
-		return result{err: fmt.Errorf("Could not get time %v", err)}
+		return result{err: fmt.Errorf("Could not get time: %v", err)}
 	}
 	tsn := time.Since(*t)
 	if tsn > 2*time.Second || tsn < -2*time.Second {
