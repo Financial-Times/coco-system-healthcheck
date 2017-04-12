@@ -12,16 +12,21 @@ import (
 var offsetCh chan result
 var pools = []string{"0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org", "3.pool.ntp.org"}
 
-type ntpChecker struct{}
+type ntpChecker interface {
+	Checks() []fthealth.Check
+	Check() (string, error)
+}
 
-func (ntpc ntpChecker) Checks() []fthealth.Check {
+type ntpCheckerImpl struct{}
+
+func (ntpc ntpCheckerImpl) Checks() []fthealth.Check {
 	offsetCh = make(chan result)
 	go loop(ntpOffset, 60, offsetCh)
 
 	ntpCheck := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be affected",
 		Name:             "NTP sync check",
-		PanicGuide:       "Please refer to the technical summary section below",
+		PanicGuide:       "https://dewey.ft.com/upp-system-healthcheck.html",
 		Severity:         2,
 		TechnicalSummary: "System time has drifted out of sync of the box, investigate `timedatectl` and `systemd-timesyncd.service`",
 		Checker:          ntpc.Check,
@@ -29,7 +34,7 @@ func (ntpc ntpChecker) Checks() []fthealth.Check {
 	return []fthealth.Check{ntpCheck}
 }
 
-func (ntpc ntpChecker) Check() (string, error) {
+func (ntpc ntpCheckerImpl) Check() (string, error) {
 	offset := <-offsetCh
 	return offset.val, offset.err
 }
