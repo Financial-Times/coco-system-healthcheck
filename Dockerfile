@@ -28,5 +28,4 @@ RUN apk add --no-cache --virtual .build-dependencies git \
   && rm -rf $GOPATH/src $GOPATH/pkg $GOPATH/.cache $GOPATH/bin /${PROJECT}-sources
 
 WORKDIR /
-# Using the expanded command, so that the shell will expand the $PROJECT env var. See https://docs.docker.com/engine/reference/builder/#cmd
-CMD ["sh", "-c", "/${PROJECT}"]
+CMD [ "/coco-system-healthcheck" ]
