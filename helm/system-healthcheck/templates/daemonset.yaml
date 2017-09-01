@@ -1,0 +1,44 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: {{ .Values.service.name }} 
+  labels:
+    app: {{ .Values.service.name }} 
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.service.name }} 
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.service.name }} 
+        visualize: "true"
+    spec:
+      containers:
+      - name: {{ .Values.service.name }} 
+        image: {{ .Values.image.repository }}:{{ .Chart.Version }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        volumeMounts:
+        - mountPath: {{ .Values.volumes.system_hc_host_mount_path }}
+          name: host-root-directory
+        env:
+        - name: SYS_HC_HOST_PATH
+          value: {{ .Values.env.system_hc_host_path }}
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: 8080
+        readinessProbe:
+          httpGet:
+            path: /__gtg
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+      volumes:
+      - name: host-root-directory
+        hostPath:
+          path:  {{ .Values.volumes.system_hc_host_volume_path}}

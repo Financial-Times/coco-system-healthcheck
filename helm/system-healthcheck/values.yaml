@@ -1,0 +1,22 @@
+# Default values for system-healthcheck.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+service:
+  name: "" # The name of the service, should be defined in the specific app-configs folder.
+  hasHealthcheck: "true"
+  isResilient: "true"
+  isDaemon: "true"
+replicaCount: 2
+image:
+  repository: coco/coco-system-healthcheck
+  pullPolicy: IfNotPresent
+env:
+    system_hc_host_path: "host_dir"
+volumes:
+    system_hc_host_mount_path: /host_dir
+    system_hc_host_volume_path: /
+resources:
+  limits:
+    memory: 256Mi
+
+
