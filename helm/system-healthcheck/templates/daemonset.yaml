@@ -14,16 +14,9 @@ spec:
         app: {{ .Values.service.name }} 
         visualize: "true"
     spec:
+      # ensure that sys-hc will be deployed to all nodes
       tolerations:
-      # Making sure that system-hc will be scheduled on dedicated nodes for kafka and mongo
-      - key: "dedicated"
-        operator: "Equal"
-        value: "kafka"
-        effect: "NoSchedule"
-      - key: "dedicated"
-        operator: "Equal"
-        value: "mongo"
-        effect: "NoSchedule"
+      - operator: "Exists"
       containers:
       - name: {{ .Values.service.name }} 
         image: {{ .Values.image.repository }}:{{ .Chart.Version }}
