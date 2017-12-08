@@ -14,6 +14,9 @@ spec:
         app: {{ .Values.service.name }} 
         visualize: "true"
     spec:
+      # ensure that sys-hc will be deployed to all nodes
+      tolerations:
+      - operator: "Exists"
       containers:
       - name: {{ .Values.service.name }} 
         image: {{ .Values.image.repository }}:{{ .Chart.Version }}
