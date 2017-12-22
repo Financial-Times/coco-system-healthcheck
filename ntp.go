@@ -10,7 +10,7 @@ import (
 )
 
 var offsetCh chan result
-var pools = []string{"0.coreos.pool.ntp.org", "1.coreos.pool.ntp.org", "2.coreos.pool.ntp.org", "3.coreos.pool.ntp.org"}
+var pools = []string{"2.coreos.pool.ntp.org", "1.coreos.pool.ntp.org", "0.coreos.pool.ntp.org", "3.coreos.pool.ntp.org"}
 
 type ntpChecker interface {
 	Checks() []fthealth.Check
