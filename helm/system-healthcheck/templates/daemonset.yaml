@@ -9,7 +9,7 @@ spec:
     matchLabels:
       app: {{ .Values.service.name }} 
   updateStrategy:
-  - type: RollingUpdate
+    type: "RollingUpdate"
   template:
     metadata:
       labels:
