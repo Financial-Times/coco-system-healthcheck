@@ -1,4 +1,3 @@
 # Values used for the deployed application.
-replicaCount: 2
 service:
   name: system-healthcheck
