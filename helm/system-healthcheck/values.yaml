@@ -17,6 +17,6 @@ volumes:
     system_hc_host_volume_path: /
 resources:
   limits:
-    memory: 256Mi
-
-
+    memory: 128Mi
+  requests:
+    memory: 64Mi
