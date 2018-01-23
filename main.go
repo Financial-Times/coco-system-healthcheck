@@ -40,7 +40,7 @@ func main() {
 	r := mux.NewRouter()
 	timedHC := fthealth.TimedHealthCheck{
 		HealthCheck: fthealth.HealthCheck{
-			SystemCode:  "system-healthcheck",
+			SystemCode:  "upp-system-healthcheck",
 			Name:        "System Healthcheck",
 			Description: "Monitors system parameters.",
 			Checks:      checks,
