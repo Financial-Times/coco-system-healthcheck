@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 
+	"errors"
+
 	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	linuxproc "github.com/c9s/goprocinfo/linux"
-	"errors"
 )
 
 type loadAverageChecker interface {

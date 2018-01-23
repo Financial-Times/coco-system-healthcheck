@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	linuxproc "github.com/c9s/goprocinfo/linux"
-	"os"
 )
 
 type inodeChecker struct {

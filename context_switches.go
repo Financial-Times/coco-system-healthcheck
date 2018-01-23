@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"time"
+
 	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	linuxproc "github.com/c9s/goprocinfo/linux"
-	"time"
 )
 
 type contextSwitchChecker struct {
