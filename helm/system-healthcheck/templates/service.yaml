@@ -1,5 +1,3 @@
-##this is an example service.yaml that should be customized in order to meet the configuration for app service
-
 kind: Service
 apiVersion: v1
 metadata:

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	fthealth "github.com/Financial-Times/go-fthealth/v1a"
+	fthealth "github.com/Financial-Times/go-fthealth/v1_1"
 	linuxproc "github.com/c9s/goprocinfo/linux"
 )
 

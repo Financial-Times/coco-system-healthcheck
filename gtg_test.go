@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	fthealth "github.com/Financial-Times/go-fthealth/v1a"
+	fthealth "github.com/Financial-Times/go-fthealth/v1_1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -14,14 +14,12 @@ func TestCheckHappyFlow(t *testing.T) {
 	mockedLac := &mockedLoadAverageChecker{}
 	mockedMc := &mockedMemoryChecker{}
 	mockedNtpc := &mockedNtpChecker{}
-	mockedTcpc := &mockedTcpChecker{}
 
 	gtg := gtgService{
 		dfc:  mockedDfc,
 		lac:  mockedLac,
 		mc:   mockedMc,
 		ntpc: mockedNtpc,
-		tcpc: mockedTcpc,
 	}
 
 	mockedDfc.On("RootDiskSpaceCheck").Return("", nil)
@@ -29,7 +27,6 @@ func TestCheckHappyFlow(t *testing.T) {
 	mockedLac.On("Check").Return("", nil)
 	mockedMc.On("AvMemoryCheck").Return("", nil)
 	mockedNtpc.On("Check").Return("", nil)
-	mockedTcpc.On("Check").Return("", nil)
 
 	status := gtg.Check()
 
@@ -41,14 +38,12 @@ func TestCheckInsufficientRootDiskSpace(t *testing.T) {
 	mockedLac := &mockedLoadAverageChecker{}
 	mockedMc := &mockedMemoryChecker{}
 	mockedNtpc := &mockedNtpChecker{}
-	mockedTcpc := &mockedTcpChecker{}
 
 	gtg := gtgService{
 		dfc:  mockedDfc,
 		lac:  mockedLac,
 		mc:   mockedMc,
 		ntpc: mockedNtpc,
-		tcpc: mockedTcpc,
 	}
 
 	mockedDfc.On("RootDiskSpaceCheck").Return("", errors.New("Insuficient root disk space"))
@@ -56,7 +51,6 @@ func TestCheckInsufficientRootDiskSpace(t *testing.T) {
 	mockedLac.On("Check").Return("", nil)
 	mockedMc.On("AvMemoryCheck").Return("", nil)
 	mockedNtpc.On("Check").Return("", nil)
-	mockedTcpc.On("Check").Return("", nil)
 
 	status := gtg.Check()
 
@@ -68,14 +62,12 @@ func TestCheckInsufficientMountedDiskSpace(t *testing.T) {
 	mockedLac := &mockedLoadAverageChecker{}
 	mockedMc := &mockedMemoryChecker{}
 	mockedNtpc := &mockedNtpChecker{}
-	mockedTcpc := &mockedTcpChecker{}
 
 	gtg := gtgService{
 		dfc:  mockedDfc,
 		lac:  mockedLac,
 		mc:   mockedMc,
 		ntpc: mockedNtpc,
-		tcpc: mockedTcpc,
 	}
 
 	mockedDfc.On("RootDiskSpaceCheck").Return("", nil)
@@ -83,7 +75,6 @@ func TestCheckInsufficientMountedDiskSpace(t *testing.T) {
 	mockedLac.On("Check").Return("", nil)
 	mockedMc.On("AvMemoryCheck").Return("", nil)
 	mockedNtpc.On("Check").Return("", nil)
-	mockedTcpc.On("Check").Return("", nil)
 
 	status := gtg.Check()
 
@@ -95,14 +86,12 @@ func TestCheckHighAverageCPULoad(t *testing.T) {
 	mockedLac := &mockedLoadAverageChecker{}
 	mockedMc := &mockedMemoryChecker{}
 	mockedNtpc := &mockedNtpChecker{}
-	mockedTcpc := &mockedTcpChecker{}
 
 	gtg := gtgService{
 		dfc:  mockedDfc,
 		lac:  mockedLac,
 		mc:   mockedMc,
 		ntpc: mockedNtpc,
-		tcpc: mockedTcpc,
 	}
 
 	mockedDfc.On("RootDiskSpaceCheck").Return("", nil)
@@ -110,7 +99,6 @@ func TestCheckHighAverageCPULoad(t *testing.T) {
 	mockedLac.On("Check").Return("", errors.New("The average load is above recommended average"))
 	mockedMc.On("AvMemoryCheck").Return("", nil)
 	mockedNtpc.On("Check").Return("", nil)
-	mockedTcpc.On("Check").Return("", nil)
 
 	status := gtg.Check()
 
@@ -122,14 +110,12 @@ func TestCheckHighAverageMemoryLoad(t *testing.T) {
 	mockedLac := &mockedLoadAverageChecker{}
 	mockedMc := &mockedMemoryChecker{}
 	mockedNtpc := &mockedNtpChecker{}
-	mockedTcpc := &mockedTcpChecker{}
 
 	gtg := gtgService{
 		dfc:  mockedDfc,
 		lac:  mockedLac,
 		mc:   mockedMc,
 		ntpc: mockedNtpc,
-		tcpc: mockedTcpc,
 	}
 
 	mockedDfc.On("RootDiskSpaceCheck").Return("", nil)
@@ -137,7 +123,6 @@ func TestCheckHighAverageMemoryLoad(t *testing.T) {
 	mockedLac.On("Check").Return("", nil)
 	mockedMc.On("AvMemoryCheck").Return("", errors.New("The average memory load is above recommended average"))
 	mockedNtpc.On("Check").Return("", nil)
-	mockedTcpc.On("Check").Return("", nil)
 
 	status := gtg.Check()
 
@@ -149,14 +134,12 @@ func TestCheckNtpOutOfSync(t *testing.T) {
 	mockedLac := &mockedLoadAverageChecker{}
 	mockedMc := &mockedMemoryChecker{}
 	mockedNtpc := &mockedNtpChecker{}
-	mockedTcpc := &mockedTcpChecker{}
 
 	gtg := gtgService{
 		dfc:  mockedDfc,
 		lac:  mockedLac,
 		mc:   mockedMc,
 		ntpc: mockedNtpc,
-		tcpc: mockedTcpc,
 	}
 
 	mockedDfc.On("RootDiskSpaceCheck").Return("", nil)
@@ -164,34 +147,6 @@ func TestCheckNtpOutOfSync(t *testing.T) {
 	mockedLac.On("Check").Return("", nil)
 	mockedMc.On("AvMemoryCheck").Return("", nil)
 	mockedNtpc.On("Check").Return("", errors.New("The ntp is out of sync"))
-	mockedTcpc.On("Check").Return("", nil)
-
-	status := gtg.Check()
-
-	assert.Equal(t, false, status.GoodToGo)
-}
-
-func TestCheckUnsuccessfulTcpConnection(t *testing.T) {
-	mockedDfc := &mockedDiskFreeChecker{}
-	mockedLac := &mockedLoadAverageChecker{}
-	mockedMc := &mockedMemoryChecker{}
-	mockedNtpc := &mockedNtpChecker{}
-	mockedTcpc := &mockedTcpChecker{}
-
-	gtg := gtgService{
-		dfc:  mockedDfc,
-		lac:  mockedLac,
-		mc:   mockedMc,
-		ntpc: mockedNtpc,
-		tcpc: mockedTcpc,
-	}
-
-	mockedDfc.On("RootDiskSpaceCheck").Return("", nil)
-	mockedDfc.On("MountedDiskSpaceCheck").Return("", nil)
-	mockedLac.On("Check").Return("", nil)
-	mockedMc.On("AvMemoryCheck").Return("", nil)
-	mockedNtpc.On("Check").Return("", nil)
-	mockedTcpc.On("Check").Return("", errors.New("Unsuccessful connection to TCP port"))
 
 	status := gtg.Check()
 
@@ -251,19 +206,6 @@ func (m *mockedNtpChecker) Checks() []fthealth.Check {
 }
 
 func (m *mockedNtpChecker) Check() (string, error) {
-	args := m.Called()
-	return args.String(0), args.Error(1)
-}
-
-type mockedTcpChecker struct {
-	mock.Mock
-}
-
-func (m *mockedTcpChecker) Checks() []fthealth.Check {
-	return nil
-}
-
-func (m *mockedTcpChecker) Check() (string, error) {
 	args := m.Called()
 	return args.String(0), args.Error(1)
 }
