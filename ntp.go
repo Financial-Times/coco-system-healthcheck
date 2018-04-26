@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	fthealth "github.com/Financial-Times/go-fthealth/v1_1"
@@ -9,19 +11,54 @@ import (
 	"github.com/kr/pretty"
 )
 
-var offsetCh chan result
-var pools = []string{"0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org", "3.pool.ntp.org"}
+type result struct {
+	val string
+	err error
+}
+
+var earliestTime = time.Date(2010, 11, 17, 20, 34, 58, 651387237, time.UTC)
+
+var pools = []string{
+	"169.254.169.123", // AWS NTP server
+	"0.coreos.pool.ntp.org",
+	"1.coreos.pool.ntp.org",
+	"2.coreos.pool.ntp.org",
+	"3.coreos.pool.ntp.org",
+	"0.pool.ntp.org",
+	"1.pool.ntp.org",
+	"2.pool.ntp.org",
+	"3.pool.ntp.org",
+}
 
 type ntpChecker interface {
 	Checks() []fthealth.Check
 	Check() (string, error)
 }
 
-type ntpCheckerImpl struct{}
+type ntpCheckerImpl struct {
+	sync.RWMutex
+	timeDrift     time.Duration
+	pollingPeriod time.Duration
+	result        result
+}
 
-func (ntpc ntpCheckerImpl) Checks() []fthealth.Check {
-	offsetCh = make(chan result)
-	go loop(ntpOffset, 60, offsetCh)
+func (ntpc *ntpCheckerImpl) Checks() []fthealth.Check {
+	ntpc.result = result{
+		err: errors.New("No value yet"),
+	}
+
+	go func() {
+		for {
+			ntpc.Lock()
+			ntpTime, err := ntpc.callNtpWithPools(pools)
+			ntpc.result = result{
+				val: ntpTime.String(),
+				err: err,
+			}
+			ntpc.Unlock()
+			time.Sleep(ntpc.pollingPeriod)
+		}
+	}()
 
 	ntpCheck := fthealth.Check{
 		BusinessImpact:   "A part of the publishing workflow might be affected",
@@ -34,36 +71,29 @@ func (ntpc ntpCheckerImpl) Checks() []fthealth.Check {
 	return []fthealth.Check{ntpCheck}
 }
 
-func (ntpc ntpCheckerImpl) Check() (string, error) {
-	offset := <-offsetCh
-	return offset.val, offset.err
+func (ntpc *ntpCheckerImpl) Check() (string, error) {
+	ntpc.RLock()
+	defer ntpc.RUnlock()
+	return ntpc.result.val, ntpc.result.err
 }
 
-func callNtp() (*time.Time, error) {
-	return callNtpWithPools(pools)
-}
-
-func callNtpWithPools(pools []string) (*time.Time, error) {
-	var errors []result
+func (ntpc *ntpCheckerImpl) callNtpWithPools(pools []string) (*time.Time, error) {
+	var errs []error
 	for _, pool := range pools {
-		t, err := ntpclient.GetNetworkTime(pool, 123)
-		if err == nil {
-			return t, err
+		ntpTime, err := ntpclient.GetNetworkTime(pool, 123)
+		if err != nil {
+			errs = append(errs, err)
+			continue
 		}
-		errors = append(errors, result{val: pool, err: err})
+		if ntpTime.Before(earliestTime) {
+			errs = append(errs, fmt.Errorf("Time from pool %s was way too old %s", pool, ntpTime.String()))
+			continue
+		}
+		drift := time.Since(*ntpTime)
+		if drift > ntpc.timeDrift || drift < -ntpc.timeDrift {
+			return nil, fmt.Errorf("offset is greater then limit of %s: %s", ntpc.timeDrift.String(), drift)
+		}
+		return ntpTime, nil
 	}
-	return nil, fmt.Errorf("None of the pools are reachable: %# v", pretty.Formatter(errors))
-}
-
-func ntpOffset() result {
-	t, err := callNtp()
-	if err != nil {
-		return result{err: fmt.Errorf("Could not get time: %v", err)}
-	}
-	tsn := time.Since(*t)
-	if tsn > 2*time.Second || tsn < -2*time.Second {
-		return result{err: fmt.Errorf("offset is greater then limit of 2 seconds: %s", tsn)}
-	}
-
-	return result{val: tsn.String()}
+	return nil, fmt.Errorf("None of the pools are reachable: %# v", pretty.Formatter(errs))
 }

@@ -11,6 +11,8 @@ image:
   pullPolicy: IfNotPresent
 env:
     system_hc_host_path: "host_dir"
+    ntp_time_drift: "2s"
+    ntp_polling_period: "1m"
 volumes:
     system_hc_host_mount_path: /host_dir
     system_hc_host_volume_path: /
