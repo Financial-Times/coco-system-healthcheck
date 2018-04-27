@@ -16,7 +16,7 @@ func newGtgService(diskThresholdPercent, memoryThresholdPercent float64) *gtgSer
 		dfc:  diskFreeCheckerImpl{diskThresholdPercent},
 		mc:   memoryCheckerImpl{memoryThresholdPercent},
 		lac:  loadAverageCheckerImpl{},
-		ntpc: ntpCheckerImpl{},
+		ntpc: &ntpCheckerImpl{},
 	}
 }
 

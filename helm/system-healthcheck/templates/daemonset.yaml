@@ -29,6 +29,10 @@ spec:
         env:
         - name: SYS_HC_HOST_PATH
           value: {{ .Values.env.system_hc_host_path }}
+        - name: NTP_TIME_DRIFT
+          value: {{ .Values.env.ntp_time_drift }}
+        - name: NTP_POLLING_PERIOD
+          value: {{ .Values.env.ntp_polling_period }}
         ports:
         - containerPort: 8080
         livenessProbe:
