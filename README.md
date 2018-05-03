@@ -9,7 +9,7 @@ docker build -t coco/coco-system-healthcheck .
 
 ## Actual checks:
 * Root disk space
-* Persistent disk space
+* AWS EBS mounts disk space
 * Memory load
 * CPU load average 
 * NTP synch

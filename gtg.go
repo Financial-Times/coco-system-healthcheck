@@ -11,9 +11,9 @@ type gtgService struct {
 	ntpc ntpChecker
 }
 
-func newGtgService(diskThresholdPercent, memoryThresholdPercent float64) *gtgService {
+func newGtgService(rootDiskThresholdPercent int, mountsThresholdPercent int, memoryThresholdPercent float64) *gtgService {
 	return &gtgService{
-		dfc:  diskFreeCheckerImpl{diskThresholdPercent},
+		dfc:  diskFreeCheckerImpl{rootDiskThresholdPercent, mountsThresholdPercent},
 		mc:   memoryCheckerImpl{memoryThresholdPercent},
 		lac:  loadAverageCheckerImpl{},
 		ntpc: &ntpCheckerImpl{},

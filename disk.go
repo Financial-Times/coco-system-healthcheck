@@ -6,6 +6,8 @@ import (
 
 	fthealth "github.com/Financial-Times/go-fthealth/v1_1"
 	linuxproc "github.com/c9s/goprocinfo/linux"
+	"github.com/pkg/errors"
+	"io/ioutil"
 )
 
 type diskFreeChecker interface {
@@ -15,7 +17,8 @@ type diskFreeChecker interface {
 }
 
 type diskFreeCheckerImpl struct {
-	thresholdPercent float64
+	rootThresholdPercent   int
+	mountsThresholdPercent int
 }
 
 func (dff diskFreeCheckerImpl) Checks() []fthealth.Check {
@@ -29,37 +32,70 @@ func (dff diskFreeCheckerImpl) Checks() []fthealth.Check {
 	}
 
 	mountedCheck := fthealth.Check{
-		BusinessImpact:   "A part of the publishing workflow might be effected",
-		Name:             "Persistent disk space check mounted on '/vol' (always true for stateless nodes)",
+		BusinessImpact:   "A part of the publishing and delivery workflow might be effected",
+		Name:             "Persistent disk space check mounted on '" + *awsEbsMountPath + "'",
 		PanicGuide:       "https://dewey.ft.com/upp-system-healthcheck.html",
 		Severity:         2,
-		TechnicalSummary: "Please clear some disk space on the 'vol' mount",
+		TechnicalSummary: "Please clear some disk space on the '" + *awsEbsMountPath + "' mount",
 		Checker:          dff.MountedDiskSpaceCheck,
 	}
 
 	return []fthealth.Check{rootCheck, mountedCheck}
 }
 
-func (dff diskFreeCheckerImpl) diskSpaceCheck(path string) (string, error) {
+func (dff diskFreeCheckerImpl) diskSpaceCheck(path string, thresholdPercent int) (string, error) {
 	d, err := linuxproc.ReadDisk(path)
 	if err != nil {
 		return "", fmt.Errorf("Cannot read disk info of %s file system.", path)
 	}
 	pctAvail := (float64(d.Free) / float64(d.All) * 100)
-	if pctAvail < dff.thresholdPercent {
-		return fmt.Sprintf("%2.1f%%", pctAvail), fmt.Errorf("Low free space on %s. Free disk space: %2.1f%%", path, pctAvail)
+	if pctAvail < float64(thresholdPercent) {
+		return fmt.Sprintf("%s: %2.1f%%", path, pctAvail), fmt.Errorf("Low free space on %s. Free disk space: %2.1f%%", path, pctAvail)
 	}
-	return fmt.Sprintf("%2.1f%%", pctAvail), nil
+	return fmt.Sprintf("%s: %2.1f%%", path, pctAvail), nil
 }
 
 func (dff diskFreeCheckerImpl) RootDiskSpaceCheck() (string, error) {
-	return dff.diskSpaceCheck(*hostPath + "/")
+	return dff.diskSpaceCheck(*hostPath+"/", dff.rootThresholdPercent)
 }
 
 func (dff diskFreeCheckerImpl) MountedDiskSpaceCheck() (string, error) {
-	path := *hostPath + "/vol"
+	path := *hostPath + *awsEbsMountPath
+
 	if _, err := os.Stat(path); err != nil && os.IsNotExist(err) {
 		return "", nil
 	}
-	return dff.diskSpaceCheck(path)
+
+	// look for the zone folder in the path
+	zonesDir, err := ioutil.ReadDir(path)
+	if err != nil {
+		return "", fmt.Errorf("Cannot list zones folder in path '%s'. Cause: %s ", path, err.Error())
+	}
+
+	if len(zonesDir) == 0 { // if no zone folder is present then return ok
+		return "", nil
+	}
+
+	zoneDirPath := path + "/" + zonesDir[0].Name()
+	vols, err := ioutil.ReadDir(zoneDirPath)
+	if err != nil {
+		return "", fmt.Errorf("Cannot list volumes in path '%s'. Cause: %s ", zoneDirPath, err.Error())
+	}
+
+	aggStatus := ""
+	aggError := ""
+	for _, vol := range vols {
+		volStatus, err := dff.diskSpaceCheck(zoneDirPath+"/"+vol.Name(), dff.mountsThresholdPercent)
+		if err != nil {
+			aggError = aggError + err.Error() + "; "
+		} else {
+			aggStatus = aggStatus + volStatus + "; "
+		}
+	}
+
+	if len(aggError) == 0 {
+		return aggStatus, nil
+	} else {
+		return aggStatus, errors.New(aggError)
+	}
 }

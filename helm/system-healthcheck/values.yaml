@@ -11,6 +11,9 @@ image:
   pullPolicy: IfNotPresent
 env:
     system_hc_host_path: "host_dir"
+    aws_ebs_mounts_path: "/var/lib/kubelet/plugins/kubernetes.io/aws-ebs/mounts/aws"
+    mounts_threshold: "10"
+    root_disk_threshold: "20"
     ntp_time_drift: "2s"
     ntp_polling_period: "1m"
 volumes:
