@@ -27,16 +27,16 @@ func (dff diskFreeCheckerImpl) Checks() []fthealth.Check {
 		Name:             "Root disk space check",
 		PanicGuide:       "https://dewey.ft.com/upp-system-healthcheck.html",
 		Severity:         2,
-		TechnicalSummary: "Please clear some disk space on the 'root' mount",
+		TechnicalSummary: fmt.Sprintf("Free space on root volume is under %d%%",  dff.rootThresholdPercent),
 		Checker:          dff.RootDiskSpaceCheck,
 	}
 
 	mountedCheck := fthealth.Check{
 		BusinessImpact:   "A part of the publishing and delivery workflow might be effected",
-		Name:             "Persistent disk space check mounted on '" + *awsEbsMountPath + "'",
+		Name:             "AWS EBS volumes mounted under '" + *awsEbsMountPath + "'",
 		PanicGuide:       "https://dewey.ft.com/upp-system-healthcheck.html",
 		Severity:         2,
-		TechnicalSummary: "Please clear some disk space on the '" + *awsEbsMountPath + "' mount",
+		TechnicalSummary: fmt.Sprintf("Free space on mounted volumes under '%s' is under %d%%", *awsEbsMountPath,  dff.mountsThresholdPercent),
 		Checker:          dff.MountedDiskSpaceCheck,
 	}
 
@@ -50,9 +50,9 @@ func (dff diskFreeCheckerImpl) diskSpaceCheck(path string, thresholdPercent int)
 	}
 	pctAvail := (float64(d.Free) / float64(d.All) * 100)
 	if pctAvail < float64(thresholdPercent) {
-		return fmt.Sprintf("%s: %2.1f%%", path, pctAvail), fmt.Errorf("Low free space on %s. Free disk space: %2.1f%%", path, pctAvail)
+		return fmt.Sprintf("Free space on %s: %2.1f%%", path, pctAvail), fmt.Errorf("Low free space on %s. Free disk space: %2.1f%%", path, pctAvail)
 	}
-	return fmt.Sprintf("%s: %2.1f%%", path, pctAvail), nil
+	return fmt.Sprintf("Free space on %s: %2.1f%%", path, pctAvail), nil
 }
 
 func (dff diskFreeCheckerImpl) RootDiskSpaceCheck() (string, error) {

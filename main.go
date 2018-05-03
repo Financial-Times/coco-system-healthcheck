@@ -40,7 +40,7 @@ func main() {
 		Name:   "rootDiskThresholdPercent",
 		Value:  20,
 		Desc:   "For monitoring the root disk of the instances: when the free space goes bellow this percentage, the health check will fail",
-		EnvVar: "ROOT_DISK_THRESHOLD",
+		EnvVar: "ROOT_DISK_THRESHOLD_PERCENT",
 	})
 
 	awsEbsMountPath = app.String(cli.StringOpt{
@@ -54,7 +54,7 @@ func main() {
 		Name:   "mountsThresholdPercent",
 		Value:  10,
 		Desc:   "For monitoring the AWS EBSs that are mounted by Kubernetes: when the free space goes bellow this percentage, the health check will fail",
-		EnvVar: "MOUNTS_THRESHOLD",
+		EnvVar: "MOUNTS_THRESHOLD_PERCENT",
 	})
 
 	ntpTimeDrift = app.String(cli.StringOpt{

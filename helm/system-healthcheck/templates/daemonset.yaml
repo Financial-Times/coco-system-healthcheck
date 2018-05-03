@@ -31,10 +31,10 @@ spec:
           value: {{ .Values.env.system_hc_host_path }}
         - name: AWS_EBS_MOUNTS_PATH
           value: {{ .Values.env.aws_ebs_mounts_path }}
-        - name: MOUNTS_THRESHOLD
-          value: "{{ .Values.env.mounts_threshold }}"
-        - name: ROOT_DISK_THRESHOLD
-          value: "{{ .Values.env.root_disk_threshold }}"
+        - name: MOUNTS_THRESHOLD_PERCENT
+          value: "{{ .Values.env.mounts_threshold_percent }}"
+        - name: ROOT_DISK_THRESHOLD_PERCENT
+          value: "{{ .Values.env.root_disk_threshold_percent }}"
         - name: NTP_TIME_DRIFT
           value: {{ .Values.env.ntp_time_drift }}
         - name: NTP_POLLING_PERIOD
