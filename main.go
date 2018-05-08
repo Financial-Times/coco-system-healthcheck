@@ -39,7 +39,7 @@ func main() {
 	rootDiskThresholdPercent = app.Int(cli.IntOpt{
 		Name:   "rootDiskThresholdPercent",
 		Value:  20,
-		Desc:   "For monitoring the root disk of the instances: when the free space goes bellow this percentage, the health check will fail",
+		Desc:   "For monitoring the root disk of the instances: when the free space goes below this percentage, the health check will fail",
 		EnvVar: "ROOT_DISK_THRESHOLD_PERCENT",
 	})
 

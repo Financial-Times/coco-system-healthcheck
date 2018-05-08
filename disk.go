@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"errors"
 	fthealth "github.com/Financial-Times/go-fthealth/v1_1"
 	linuxproc "github.com/c9s/goprocinfo/linux"
-	"github.com/pkg/errors"
 	"io/ioutil"
 )
 
@@ -27,7 +27,7 @@ func (dff diskFreeCheckerImpl) Checks() []fthealth.Check {
 		Name:             "Root disk space check",
 		PanicGuide:       "https://dewey.ft.com/upp-system-healthcheck.html",
 		Severity:         2,
-		TechnicalSummary: fmt.Sprintf("Free space on root volume is under %d%%",  dff.rootThresholdPercent),
+		TechnicalSummary: fmt.Sprintf("Free space on root volume is under %d%%", dff.rootThresholdPercent),
 		Checker:          dff.RootDiskSpaceCheck,
 	}
 
@@ -36,7 +36,7 @@ func (dff diskFreeCheckerImpl) Checks() []fthealth.Check {
 		Name:             "AWS EBS volumes mounted under '" + *awsEbsMountPath + "'",
 		PanicGuide:       "https://dewey.ft.com/upp-system-healthcheck.html",
 		Severity:         2,
-		TechnicalSummary: fmt.Sprintf("Free space on mounted volumes under '%s' is under %d%%", *awsEbsMountPath,  dff.mountsThresholdPercent),
+		TechnicalSummary: fmt.Sprintf("Free space on mounted volumes under '%s' is under %d%%", *awsEbsMountPath, dff.mountsThresholdPercent),
 		Checker:          dff.MountedDiskSpaceCheck,
 	}
 
@@ -48,7 +48,7 @@ func (dff diskFreeCheckerImpl) diskSpaceCheck(path string, thresholdPercent int)
 	if err != nil {
 		return "", fmt.Errorf("Cannot read disk info of %s file system.", path)
 	}
-	pctAvail := (float64(d.Free) / float64(d.All) * 100)
+	pctAvail := float64(d.Free) / float64(d.All) * 100
 	if pctAvail < float64(thresholdPercent) {
 		return fmt.Sprintf("Free space on %s: %2.1f%%", path, pctAvail), fmt.Errorf("Low free space on %s. Free disk space: %2.1f%%", path, pctAvail)
 	}
