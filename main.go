@@ -13,14 +13,16 @@ import (
 )
 
 var (
-	checks           []fthealth.Check
-	hostPath         *string
-	ntpTimeDrift     *string
-	ntpPollingPeriod *string
+	checks                   []fthealth.Check
+	hostPath                 *string
+	awsEbsMountPath          *string
+	ntpTimeDrift             *string
+	ntpPollingPeriod         *string
+	rootDiskThresholdPercent *int
+	mountsThresholdPercent   *int
 )
 
 const (
-	diskThresholdPercent   = 20
 	memoryThresholdPercent = 15
 )
 
@@ -32,6 +34,27 @@ func main() {
 		Value:  "",
 		Desc:   "The dir path of the mounted host fs (in the container)",
 		EnvVar: "SYS_HC_HOST_PATH",
+	})
+
+	rootDiskThresholdPercent = app.Int(cli.IntOpt{
+		Name:   "rootDiskThresholdPercent",
+		Value:  20,
+		Desc:   "For monitoring the root disk of the instances: when the free space goes below this percentage, the health check will fail",
+		EnvVar: "ROOT_DISK_THRESHOLD_PERCENT",
+	})
+
+	awsEbsMountPath = app.String(cli.StringOpt{
+		Name:   "awsEbsMountPath",
+		Value:  "",
+		Desc:   "The folder path where the AWS EBSs are mounted by Kubernetes",
+		EnvVar: "AWS_EBS_MOUNTS_PATH",
+	})
+
+	mountsThresholdPercent = app.Int(cli.IntOpt{
+		Name:   "mountsThresholdPercent",
+		Value:  10,
+		Desc:   "For monitoring the AWS EBSs that are mounted by Kubernetes: when the free space goes bellow this percentage, the health check will fail",
+		EnvVar: "MOUNTS_THRESHOLD_PERCENT",
 	})
 
 	ntpTimeDrift = app.String(cli.StringOpt{
@@ -65,7 +88,7 @@ func main() {
 		pollingPeriod: ntpPollingPeriodDuration,
 	}
 
-	checks = append(checks, diskFreeCheckerImpl{diskThresholdPercent}.Checks()...)
+	checks = append(checks, diskFreeCheckerImpl{*rootDiskThresholdPercent, *mountsThresholdPercent}.Checks()...)
 	checks = append(checks, memoryCheckerImpl{memoryThresholdPercent}.Checks()...)
 	checks = append(checks, loadAverageCheckerImpl{}.Checks()...)
 	checks = append(checks, ntpChecker.Checks()...)
@@ -81,7 +104,7 @@ func main() {
 		Timeout: 10 * time.Second,
 	}
 	r.HandleFunc("/__health", fthealth.Handler(timedHC))
-	gtgService := newGtgService(diskThresholdPercent, memoryThresholdPercent)
+	gtgService := newGtgService(*rootDiskThresholdPercent, *mountsThresholdPercent, memoryThresholdPercent)
 	r.HandleFunc(status.GTGPath, status.NewGoodToGoHandler(gtgService.Check))
 
 	log.Print("Starting http server on 8080\n")
