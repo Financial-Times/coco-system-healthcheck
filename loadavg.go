@@ -42,8 +42,8 @@ func (lac loadAverageCheckerImpl) Check() (string, error) {
 		return "", errors.New("Couldn't read cpuinfo data")
 	}
 
-	fiveMinLimit := (1.5 * float64(cpuInfo.NumCPU()))
-	fifteenMinLimit := (0.9 * float64(cpuInfo.NumCPU()))
+	fiveMinLimit := (1.8 * float64(cpuInfo.NumCPU()))
+	fifteenMinLimit := (1.1 * float64(cpuInfo.NumCPU()))
 
 	if l.Last5Min > fiveMinLimit || l.Last15Min > fifteenMinLimit {
 		return fmt.Sprintf("Last5Min: %2.2f, Last15Min: %2.2f", l.Last5Min, l.Last15Min), fmt.Errorf("Load avg is above the recommended threshold: Last5Min: %2.2f, Last15Min: %2.2f", l.Last5Min, l.Last15Min)
