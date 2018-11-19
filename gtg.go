@@ -5,19 +5,19 @@ import (
 )
 
 type gtgService struct {
-	dfc  diskFreeChecker
-	mc   memoryChecker
-	lac  loadAverageChecker
-	ntpc ntpChecker
+	dfc   diskFreeChecker
+	mc    memoryChecker
+	lac   loadAverageChecker
+	ntpc  ntpChecker
 	apiSc apiServerChecker
 }
 
 func newGtgService(rootDiskThresholdPercent int, mountsThresholdPercent int, memoryThresholdPercent float64, apiServerURL string) *gtgService {
 	return &gtgService{
-		dfc:  diskFreeCheckerImpl{rootDiskThresholdPercent, mountsThresholdPercent},
-		mc:   memoryCheckerImpl{memoryThresholdPercent},
-		lac:  loadAverageCheckerImpl{},
-		ntpc: &ntpCheckerImpl{},
+		dfc:   diskFreeCheckerImpl{rootDiskThresholdPercent, mountsThresholdPercent},
+		mc:    memoryCheckerImpl{memoryThresholdPercent},
+		lac:   loadAverageCheckerImpl{},
+		ntpc:  &ntpCheckerImpl{},
 		apiSc: &apiServerCheckerImpl{apiServerURL},
 	}
 }

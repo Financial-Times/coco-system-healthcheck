@@ -64,12 +64,12 @@ func (checker *apiServerCheckerImpl) certificateExpiresInOneMonth() (bool, *time
 		return false, nil, err
 	}
 
-	if resp.StatusCode != 200 {
-		return false, nil, fmt.Errorf("the api server returned status %d", 500)
+	if resp.StatusCode == 200 || resp.StatusCode == 401 {
+		expiryDate := resp.TLS.PeerCertificates[0].NotAfter
+
+		oneMonthFromNow := time.Now().AddDate(0, 1, 0)
+		return expiryDate.Before(oneMonthFromNow), &expiryDate, nil
 	}
 
-	expiryDate := resp.TLS.PeerCertificates[0].NotAfter
-
-	oneMonthFromNow := time.Now().AddDate(0, 1, 0)
-	return expiryDate.Before(oneMonthFromNow), &expiryDate, nil
+	return false, nil, fmt.Errorf("the api server returned status %d", resp.StatusCode)
 }
