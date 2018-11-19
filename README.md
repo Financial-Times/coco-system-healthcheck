@@ -14,3 +14,4 @@ docker build -t coco/coco-system-healthcheck .
 * CPU load average 
 * NTP synch
 * TCP connection available in 8080
+* K8S API server certificate doesn't expire in one month

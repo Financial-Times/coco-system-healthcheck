@@ -9,14 +9,16 @@ type gtgService struct {
 	mc   memoryChecker
 	lac  loadAverageChecker
 	ntpc ntpChecker
+	apiSc apiServerChecker
 }
 
-func newGtgService(rootDiskThresholdPercent int, mountsThresholdPercent int, memoryThresholdPercent float64) *gtgService {
+func newGtgService(rootDiskThresholdPercent int, mountsThresholdPercent int, memoryThresholdPercent float64, apiServerURL string) *gtgService {
 	return &gtgService{
 		dfc:  diskFreeCheckerImpl{rootDiskThresholdPercent, mountsThresholdPercent},
 		mc:   memoryCheckerImpl{memoryThresholdPercent},
 		lac:  loadAverageCheckerImpl{},
 		ntpc: &ntpCheckerImpl{},
+		apiSc: &apiServerCheckerImpl{apiServerURL},
 	}
 }
 
@@ -36,8 +38,13 @@ func (service *gtgService) Check() gtg.Status {
 	clockSyncCheck := func() gtg.Status {
 		return gtgCheck(service.clockSyncChecker)
 	}
+
+	apiServerCertCheck := func() gtg.Status {
+		return gtgCheck(service.apiServerCertChecker)
+	}
+
 	return gtg.FailFastParallelCheck(
-		[]gtg.StatusChecker{mountedDiskSpaceCheck, rootDiskSpaceCheck, memoryUsageCheck, loadAverageCheck, clockSyncCheck})()
+		[]gtg.StatusChecker{mountedDiskSpaceCheck, rootDiskSpaceCheck, memoryUsageCheck, loadAverageCheck, clockSyncCheck, apiServerCertCheck})()
 }
 
 func gtgCheck(handler func() (string, error)) gtg.Status {
@@ -80,4 +87,11 @@ func (service *gtgService) clockSyncChecker() (string, error) {
 		return err.Error(), err
 	}
 	return "Clock sync check OK.", nil
+}
+
+func (service *gtgService) apiServerCertChecker() (string, error) {
+	if _, err := service.apiSc.CheckCertificate(); err != nil {
+		return err.Error(), err
+	}
+	return "Api server certificate check OK.", nil
 }

@@ -14,12 +14,14 @@ func TestCheckHappyFlow(t *testing.T) {
 	mockedLac := &mockedLoadAverageChecker{}
 	mockedMc := &mockedMemoryChecker{}
 	mockedNtpc := &mockedNtpChecker{}
+	mockedApisc := &mockedAPIServerChecker{}
 
 	gtg := gtgService{
-		dfc:  mockedDfc,
-		lac:  mockedLac,
-		mc:   mockedMc,
-		ntpc: mockedNtpc,
+		dfc:   mockedDfc,
+		lac:   mockedLac,
+		mc:    mockedMc,
+		ntpc:  mockedNtpc,
+		apiSc: mockedApisc,
 	}
 
 	mockedDfc.On("RootDiskSpaceCheck").Return("", nil)
@@ -27,6 +29,7 @@ func TestCheckHappyFlow(t *testing.T) {
 	mockedLac.On("Check").Return("", nil)
 	mockedMc.On("AvMemoryCheck").Return("", nil)
 	mockedNtpc.On("Check").Return("", nil)
+	mockedApisc.On("CheckCertificate").Return("Exp date: 3.10.3000", nil)
 
 	status := gtg.Check()
 
@@ -38,12 +41,14 @@ func TestCheckInsufficientRootDiskSpace(t *testing.T) {
 	mockedLac := &mockedLoadAverageChecker{}
 	mockedMc := &mockedMemoryChecker{}
 	mockedNtpc := &mockedNtpChecker{}
+	mockedApisc := &mockedAPIServerChecker{}
 
 	gtg := gtgService{
-		dfc:  mockedDfc,
-		lac:  mockedLac,
-		mc:   mockedMc,
-		ntpc: mockedNtpc,
+		dfc:   mockedDfc,
+		lac:   mockedLac,
+		mc:    mockedMc,
+		ntpc:  mockedNtpc,
+		apiSc: mockedApisc,
 	}
 
 	mockedDfc.On("RootDiskSpaceCheck").Return("", errors.New("Insuficient root disk space"))
@@ -51,6 +56,7 @@ func TestCheckInsufficientRootDiskSpace(t *testing.T) {
 	mockedLac.On("Check").Return("", nil)
 	mockedMc.On("AvMemoryCheck").Return("", nil)
 	mockedNtpc.On("Check").Return("", nil)
+	mockedApisc.On("CheckCertificate").Return("Exp date: 3.10.3000", nil)
 
 	status := gtg.Check()
 
@@ -62,12 +68,14 @@ func TestCheckInsufficientMountedDiskSpace(t *testing.T) {
 	mockedLac := &mockedLoadAverageChecker{}
 	mockedMc := &mockedMemoryChecker{}
 	mockedNtpc := &mockedNtpChecker{}
+	mockedApisc := &mockedAPIServerChecker{}
 
 	gtg := gtgService{
-		dfc:  mockedDfc,
-		lac:  mockedLac,
-		mc:   mockedMc,
-		ntpc: mockedNtpc,
+		dfc:   mockedDfc,
+		lac:   mockedLac,
+		mc:    mockedMc,
+		ntpc:  mockedNtpc,
+		apiSc: mockedApisc,
 	}
 
 	mockedDfc.On("RootDiskSpaceCheck").Return("", nil)
@@ -75,6 +83,7 @@ func TestCheckInsufficientMountedDiskSpace(t *testing.T) {
 	mockedLac.On("Check").Return("", nil)
 	mockedMc.On("AvMemoryCheck").Return("", nil)
 	mockedNtpc.On("Check").Return("", nil)
+	mockedApisc.On("CheckCertificate").Return("Exp date: 3.10.3000", nil)
 
 	status := gtg.Check()
 
@@ -86,12 +95,14 @@ func TestCheckHighAverageCPULoad(t *testing.T) {
 	mockedLac := &mockedLoadAverageChecker{}
 	mockedMc := &mockedMemoryChecker{}
 	mockedNtpc := &mockedNtpChecker{}
+	mockedApisc := &mockedAPIServerChecker{}
 
 	gtg := gtgService{
-		dfc:  mockedDfc,
-		lac:  mockedLac,
-		mc:   mockedMc,
-		ntpc: mockedNtpc,
+		dfc:   mockedDfc,
+		lac:   mockedLac,
+		mc:    mockedMc,
+		ntpc:  mockedNtpc,
+		apiSc: mockedApisc,
 	}
 
 	mockedDfc.On("RootDiskSpaceCheck").Return("", nil)
@@ -99,6 +110,7 @@ func TestCheckHighAverageCPULoad(t *testing.T) {
 	mockedLac.On("Check").Return("", errors.New("The average load is above recommended average"))
 	mockedMc.On("AvMemoryCheck").Return("", nil)
 	mockedNtpc.On("Check").Return("", nil)
+	mockedApisc.On("CheckCertificate").Return("Exp date: 3.10.3000", nil)
 
 	status := gtg.Check()
 
@@ -110,12 +122,14 @@ func TestCheckHighAverageMemoryLoad(t *testing.T) {
 	mockedLac := &mockedLoadAverageChecker{}
 	mockedMc := &mockedMemoryChecker{}
 	mockedNtpc := &mockedNtpChecker{}
+	mockedApisc := &mockedAPIServerChecker{}
 
 	gtg := gtgService{
-		dfc:  mockedDfc,
-		lac:  mockedLac,
-		mc:   mockedMc,
-		ntpc: mockedNtpc,
+		dfc:   mockedDfc,
+		lac:   mockedLac,
+		mc:    mockedMc,
+		ntpc:  mockedNtpc,
+		apiSc: mockedApisc,
 	}
 
 	mockedDfc.On("RootDiskSpaceCheck").Return("", nil)
@@ -123,6 +137,7 @@ func TestCheckHighAverageMemoryLoad(t *testing.T) {
 	mockedLac.On("Check").Return("", nil)
 	mockedMc.On("AvMemoryCheck").Return("", errors.New("The average memory load is above recommended average"))
 	mockedNtpc.On("Check").Return("", nil)
+	mockedApisc.On("CheckCertificate").Return("Exp date: 3.10.3000", nil)
 
 	status := gtg.Check()
 
@@ -134,12 +149,14 @@ func TestCheckNtpOutOfSync(t *testing.T) {
 	mockedLac := &mockedLoadAverageChecker{}
 	mockedMc := &mockedMemoryChecker{}
 	mockedNtpc := &mockedNtpChecker{}
+	mockedApisc := &mockedAPIServerChecker{}
 
 	gtg := gtgService{
-		dfc:  mockedDfc,
-		lac:  mockedLac,
-		mc:   mockedMc,
-		ntpc: mockedNtpc,
+		dfc:   mockedDfc,
+		lac:   mockedLac,
+		mc:    mockedMc,
+		ntpc:  mockedNtpc,
+		apiSc: mockedApisc,
 	}
 
 	mockedDfc.On("RootDiskSpaceCheck").Return("", nil)
@@ -147,9 +164,36 @@ func TestCheckNtpOutOfSync(t *testing.T) {
 	mockedLac.On("Check").Return("", nil)
 	mockedMc.On("AvMemoryCheck").Return("", nil)
 	mockedNtpc.On("Check").Return("", errors.New("The ntp is out of sync"))
+	mockedApisc.On("CheckCertificate").Return("Exp date: 3.10.3000", nil)
 
 	status := gtg.Check()
 
+	assert.Equal(t, false, status.GoodToGo)
+}
+
+func TestCheckApiServerNotValidCert(t *testing.T) {
+	mockedDfc := &mockedDiskFreeChecker{}
+	mockedLac := &mockedLoadAverageChecker{}
+	mockedMc := &mockedMemoryChecker{}
+	mockedNtpc := &mockedNtpChecker{}
+	mockedApisc := &mockedAPIServerChecker{}
+
+	gtg := gtgService{
+		dfc:   mockedDfc,
+		lac:   mockedLac,
+		mc:    mockedMc,
+		ntpc:  mockedNtpc,
+		apiSc: mockedApisc,
+	}
+
+	mockedDfc.On("RootDiskSpaceCheck").Return("", nil)
+	mockedDfc.On("MountedDiskSpaceCheck").Return("", nil)
+	mockedLac.On("Check").Return("", nil)
+	mockedMc.On("AvMemoryCheck").Return("", nil)
+	mockedNtpc.On("Check").Return("", nil)
+	mockedApisc.On("CheckCertificate").Return("Exp date: 3.10.2018", errors.New("the API server certificate expires in less than one month"))
+
+	status := gtg.Check()
 	assert.Equal(t, false, status.GoodToGo)
 }
 
@@ -206,6 +250,19 @@ func (m *mockedNtpChecker) Checks() []fthealth.Check {
 }
 
 func (m *mockedNtpChecker) Check() (string, error) {
+	args := m.Called()
+	return args.String(0), args.Error(1)
+}
+
+type mockedAPIServerChecker struct {
+	mock.Mock
+}
+
+func (m *mockedAPIServerChecker) Checks() []fthealth.Check {
+	return nil
+}
+
+func (m *mockedAPIServerChecker) CheckCertificate() (string, error) {
 	args := m.Called()
 	return args.String(0), args.Error(1)
 }

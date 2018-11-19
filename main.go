@@ -18,6 +18,7 @@ var (
 	awsEbsMountPath          *string
 	ntpTimeDrift             *string
 	ntpPollingPeriod         *string
+	apiServerURL             *string
 	rootDiskThresholdPercent *int
 	mountsThresholdPercent   *int
 )
@@ -64,6 +65,13 @@ func main() {
 		EnvVar: "NTP_TIME_DRIFT",
 	})
 
+	apiServerURL = app.String(cli.StringOpt{
+		Name:   "apiServerURL",
+		Value:  "",
+		Desc:   "The URL of the Kubernetes API server of the cluster",
+		EnvVar: "K8S_API_SERVER_URL",
+	})
+
 	ntpTimeDriftDuration, err := time.ParseDuration(*ntpTimeDrift)
 	if err != nil {
 		ntpTimeDriftDuration = time.Second * 2
@@ -88,10 +96,13 @@ func main() {
 		pollingPeriod: ntpPollingPeriodDuration,
 	}
 
+	apiServerChecker := &apiServerCheckerImpl{url: *apiServerURL}
+
 	checks = append(checks, diskFreeCheckerImpl{*rootDiskThresholdPercent, *mountsThresholdPercent}.Checks()...)
 	checks = append(checks, memoryCheckerImpl{memoryThresholdPercent}.Checks()...)
 	checks = append(checks, loadAverageCheckerImpl{}.Checks()...)
 	checks = append(checks, ntpChecker.Checks()...)
+	checks = append(checks, apiServerChecker.Checks()...)
 
 	r := mux.NewRouter()
 	timedHC := fthealth.TimedHealthCheck{
@@ -104,7 +115,7 @@ func main() {
 		Timeout: 10 * time.Second,
 	}
 	r.HandleFunc("/__health", fthealth.Handler(timedHC))
-	gtgService := newGtgService(*rootDiskThresholdPercent, *mountsThresholdPercent, memoryThresholdPercent)
+	gtgService := newGtgService(*rootDiskThresholdPercent, *mountsThresholdPercent, memoryThresholdPercent, *apiServerURL)
 	r.HandleFunc(status.GTGPath, status.NewGoodToGoHandler(gtgService.Check))
 
 	log.Print("Starting http server on 8080\n")
