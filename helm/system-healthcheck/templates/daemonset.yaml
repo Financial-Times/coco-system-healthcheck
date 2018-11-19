@@ -39,6 +39,11 @@ spec:
           value: {{ .Values.env.ntp_time_drift }}
         - name: NTP_POLLING_PERIOD
           value: {{ .Values.env.ntp_polling_period }}
+        - name: K8S_API_SERVER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: global-config
+              key: cluster.api-url
         ports:
         - containerPort: 8080
         livenessProbe:
