@@ -3,9 +3,10 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
-	fthealth "github.com/Financial-Times/go-fthealth/v1_1"
 	"net/http"
 	"time"
+
+	fthealth "github.com/Financial-Times/go-fthealth/v1_1"
 )
 
 type apiServerChecker interface {
@@ -23,7 +24,7 @@ func (checker *apiServerCheckerImpl) Checks() []fthealth.Check {
 		Name:             "Kubernetes API server certificate check",
 		PanicGuide:       "https://github.com/Financial-Times/content-k8s-provisioner#rotating-the-tls-assets-for-a-cluster",
 		Severity:         2,
-		TechnicalSummary: "Rotate the TLS assets on the Kubernetes cluster if the API server certificate expires",
+		TechnicalSummary: "Rotate the TLS assets on the Kubernetes cluster before the API server certificate expires",
 		Checker:          checker.CheckCertificate,
 	}
 

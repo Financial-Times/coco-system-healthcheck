@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCheckCertificateWrongStatus(t *testing.T) {
