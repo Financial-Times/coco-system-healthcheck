@@ -18,6 +18,16 @@ type apiServerCheckerImpl struct {
 	url string
 }
 
+var httpClient = &http.Client{
+	Timeout: 5 * time.Second,
+	Transport: &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+		MaxIdleConnsPerHost: 100,
+	},
+}
+
 func (checker *apiServerCheckerImpl) Checks() []fthealth.Check {
 	check := fthealth.Check{
 		BusinessImpact:   "Kubernetes API server will become unavailable",
@@ -45,16 +55,6 @@ func (checker *apiServerCheckerImpl) CheckCertificate() (string, error) {
 }
 
 func (checker *apiServerCheckerImpl) certificateExpiresInOneMonth() (bool, *time.Time, error) {
-	httpClient := &http.Client{
-		Timeout: 5 * time.Second,
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true,
-			},
-			MaxIdleConnsPerHost: 100,
-		},
-	}
-
 	req, err := http.NewRequest("HEAD", checker.url, nil)
 	if err != nil {
 		return false, nil, err
