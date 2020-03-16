@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: v2
 description: system-healthcheck Helm chart for Kubernetes
 name: system-healthcheck
 version: 0.0.0
