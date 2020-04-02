@@ -65,7 +65,7 @@ func (checker *apiServerCheckerImpl) certificateExpiresInOneMonth() (bool, *time
 		return false, nil, err
 	}
 
-	if resp.StatusCode == 200 || resp.StatusCode == 401 {
+	if resp.StatusCode == 200 || resp.StatusCode == 401 || resp.StatusCode == 403 {
 		expiryDate := resp.TLS.PeerCertificates[0].NotAfter
 
 		oneMonthFromNow := time.Now().AddDate(0, 1, 0)
