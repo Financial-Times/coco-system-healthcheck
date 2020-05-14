@@ -6,6 +6,7 @@ service:
   hasHealthcheck: "true"
   isResilient: "true"
   isDaemon: "true"
+eksCluster: false
 image:
   repository: coco/coco-system-healthcheck
   pullPolicy: IfNotPresent
