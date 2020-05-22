@@ -1,3 +1,5 @@
 # Values used for the deployed application.
 service:
   name: system-healthcheck
+
+eksCluster: true
