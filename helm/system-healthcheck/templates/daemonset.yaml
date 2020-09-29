@@ -46,8 +46,8 @@ spec:
         - name: K8S_API_SERVER_URL
           valueFrom:
             configMapKeyRef:
-              name: global-config
-              key: cluster.api-url
+              name: cluster-facts
+              key: cluster_api_url
         ports:
         - containerPort: 8080
         livenessProbe:
