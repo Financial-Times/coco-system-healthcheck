@@ -24,6 +24,3 @@ resources:
     memory: 20Mi
   requests:
     memory: 8Mi
-
-
-eksCluster: false
