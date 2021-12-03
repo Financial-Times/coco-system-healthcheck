@@ -18,23 +18,6 @@ Bronze
 
 Production
 
-## Delivered By
-
-content
-
-## Supported By
-
-content
-
-## Known About By
-
-- dimitar.terziev
-- elitsa.pavlova
-- hristo.georgiev
-- donislav.belev
-- mihail.mihaylov
-- boyko.boykov
-
 ## Host Platform
 
 AWS
