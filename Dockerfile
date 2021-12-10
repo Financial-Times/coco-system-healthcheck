@@ -13,11 +13,11 @@ RUN VERSION="version=$(git describe --tag --always 2> /dev/null)" \
   && REVISION="revision=$(git rev-parse HEAD)" \
   && BUILDER="builder=$(go version)" \
   && LDFLAGS="-X '"${BUILDINFO_PACKAGE}$VERSION"' -X '"${BUILDINFO_PACKAGE}$DATETIME"' -X '"${BUILDINFO_PACKAGE}$REPOSITORY"' -X '"${BUILDINFO_PACKAGE}$REVISION"' -X '"${BUILDINFO_PACKAGE}$BUILDER"'" \
-  && go build -mod=readonly -a -o /artifacts/${PROJECT} -ldflags="${LDFLAGS}" \
+  && CGO_ENABLED=0 go build -mod=readonly -a -o /artifacts/${PROJECT} -ldflags="${LDFLAGS}" \
   && echo "Build flags: $LDFLAGS"
 
 # Multi-stage build - copy certs and the binary into the image
-FROM scratch
+FROM alpine
 WORKDIR /
 COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=0 /artifacts/* /
