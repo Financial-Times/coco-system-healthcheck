@@ -1,3 +1,4 @@
 /coco-system-healthcheck
 .idea
 vendor/*/
+.DS_Store
